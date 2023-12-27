@@ -274,6 +274,12 @@
   color: #fff;
 }
 
+.App-game-waitroom-form-subtitle-code {
+  font-weight: 750;
+
+  color: #ff0000;
+}
+
 .App-game-waitroom-form-list {
   display: flex;
   justify-content: flex-start;
@@ -282,6 +288,7 @@
   flex: 1 1 auto;
 
   width: 320px;
+  margin-bottom: 20px;
 
   background-color: #282c34;
 }
@@ -294,7 +301,6 @@
 }
 
 .App-game-waitroom-form-actions {
-  margin-top: 20px;
   margin-bottom: 20px;
 }
 

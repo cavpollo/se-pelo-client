@@ -16,15 +16,16 @@ function App() {
   const [ownerName, setOwnerName] = useState('');
   const [playerName, setPlayerName] = useState('');
   const [roomCode, setRoomCode] = useState('');
-  const [playerId, setPlayerId] = useState(0);
-  const [roomId, setRoomId] = useState(0);
   const [players, setPlayers] = useState([]); // {'id': 1, 'name': "Randolfo"}
-
+  
+  let playerId = 0;
+  let roomId = 0;
 
   const showmenu = () => {
     setGameMenuVisibility('');
     setGameMenuCreateVisibility('none');
     setGameMenuJoinVisibility('none');
+    setGameWaitRoomVisibility('none');
   }
 
   const showCreateRoom = () => {
@@ -63,21 +64,31 @@ function App() {
     //TODO: show game room stuff
   }
 
+  const toPlayer = (jsonPlayer) => {
+    return {'id': jsonPlayer['player_id'], 'name': jsonPlayer['player_name'], 'is_owner': jsonPlayer['is_owner']}
+  }
 
-  const waitingRoomPollFrequencyInMs = 250;
-  const waitingRoomPollFailureInMs = 10 * 1000;
+  const waitingRoomPollFrequencyInMs = 30000; //1000;
+  const waitingRoomPollFailureInMs = 1000; //10 * 1000;
   let waitingRoomTimeoutId = 0;
   let timeoutFailures = 0;
-  const pollWaitingRoom = () => {
-    fetch("http://game.local:8000/waiting-room", {
-      method: "GET",
+  const pollWaitingRoom = (setPlayers) => {
+
+    console.log('Request:');
+    console.log({
+      room_id: roomId,
+      player_id: playerId,
+    });
+
+    fetch("http://game.local:8000/room-check", {
+      method: "POST",
       headers: {
         "Access-Control-Allow-Origin": "*",
         "Content-type": "application/json; charset=UTF-8"
       },
       body: JSON.stringify({
-        roomId: roomId,
-        playerId: playerId,
+        room_id: roomId,
+        player_id: playerId,
       })
     }).then(response => {
       return response.json();
@@ -85,16 +96,18 @@ function App() {
     .then(responseData => {
       console.log(responseData);
 
+      const parsed_players = responseData['players'].map(toPlayer);
+      setPlayers(parsed_players);
+
       timeoutFailures = 0;
-      waitingRoomTimeoutId = setTimeout(pollWaitingRoom, waitingRoomPollFrequencyInMs);
+      waitingRoomTimeoutId = setTimeout(pollWaitingRoom, waitingRoomPollFrequencyInMs, setPlayers);
     })
     .catch(error => {
       console.error(error);
 
-      //TODO: re-enable
-      //timeoutFailures++;
+      timeoutFailures = timeoutFailures + waitingRoomPollFrequencyInMs;
 
-      if (timeoutFailures >= (waitingRoomPollFailureInMs / waitingRoomPollFrequencyInMs)) {
+      if (timeoutFailures >= waitingRoomPollFailureInMs) {
         alert('¡Ha ocurrido un error! Chequea tu conexión, o quejate con el administrador.');
 
         //TODO: Somehow show visual feedback of a lack of connection.
@@ -110,7 +123,7 @@ function App() {
     return ownerName.trim().length > 0 && ownerName.trim().length <= 16;
   }
 
-  const createRoom = () => {
+  const createRoom = (ownerName, setRoomCode, setPlayers) => {
     if (ownerNameValid()) {
       setCreateGameButtonEnabled(false);
 
@@ -121,7 +134,7 @@ function App() {
           "Content-type": "application/json; charset=UTF-8"
         },
         body: JSON.stringify({
-          name: ownerName,
+          owner_name: ownerName,
         })
       }).then(response => {
         return response.json();
@@ -129,17 +142,21 @@ function App() {
       .then(responseData => {
         console.log(responseData);
 
+        setRoomCode(responseData['room_code']);
+        playerId = responseData['player_id'];
+        roomId = responseData['room_id'];
+
         showWaitingRoom(true);
 
-        pollWaitingRoom();
+        pollWaitingRoom(setPlayers);
       })
       .catch(error => {
         console.error(error);
-        //TODO: re-enable
-        // alert('¡Ha ocurrido un error! Chequea tu conexión y vuelve a intentarlo, o quejate con el administrador.');
-        //TODO: dis-enable
-        showWaitingRoom(true);
-        pollWaitingRoom();
+        alert('¡Ha ocurrido un error! Chequea tu conexión y vuelve a intentarlo, o quejate con el administrador.');
+        
+        //TODO: remove after testing
+        // showWaitingRoom(true);
+        // pollWaitingRoom();
       });
     } else {
       alert('¡Nombre invalido!');
@@ -154,7 +171,7 @@ function App() {
     return roomCode.trim().length > 0 && roomCode.trim().length <= 6;
   }
 
-  const joinRoom = () => {
+  const joinRoom = (playerName, roomCode, setPlayers) => {
     if (playerNameValid()) {
       if (roomCodeValid()) {
         setStartGameButtonEnabled(false);
@@ -166,8 +183,8 @@ function App() {
             "Content-type": "application/json; charset=UTF-8"
           },
           body: JSON.stringify({
-            name: playerName,
-            code: roomCode,
+            player_name: playerName,
+            room_code: roomCode,
           })
         }).then(response => {
           return response.json();
@@ -175,7 +192,12 @@ function App() {
         .then(responseData => {
           console.log(responseData);
 
+          playerId = responseData['player_id'];
+          roomId = responseData['room_id'];
+
           showWaitingRoom(false);
+
+          pollWaitingRoom(setPlayers);
         })
         .catch(error => {
           console.error(error);
@@ -218,8 +240,8 @@ function App() {
               "Content-type": "application/json; charset=UTF-8"
             },
             body: JSON.stringify({
-              playerId: playerId,
-              roomId: roomId,
+              player_id: playerId,
+              roomI_id: roomId,
             })
           }).then(response => {
             return response.json();
@@ -279,7 +301,7 @@ function App() {
               </label>
             </div>
             <div className="App-game-option-form-content">
-              <button className="App-game-option-form-button" type="button" disabled={!createGameButtonEnabled || !ownerNameValid()} onClick={_ => createRoom()}>
+              <button className="App-game-option-form-button" type="button" disabled={!createGameButtonEnabled || !ownerNameValid()} onClick={_ => createRoom(ownerName, setRoomCode, setPlayers)}>
                 Crear la partida
               </button>
             </div>
@@ -306,7 +328,7 @@ function App() {
               </label>
             </div>
             <div className="App-game-option-form-content">
-              <button className="App-game-option-form-button" type="button" disabled={!joinGameButtonEnabled || !playerNameValid() || !roomCodeValid()} onClick={_ => joinRoom()}>
+              <button className="App-game-option-form-button" type="button" disabled={!joinGameButtonEnabled || !playerNameValid() || !roomCodeValid()} onClick={_ => joinRoom(playerName, roomCode, setPlayers)}>
                 Unirse a la partida
               </button>
             </div>
@@ -318,12 +340,15 @@ function App() {
               Sala de espera
             </div>
             <div className="App-game-waitroom-form-subtitle">
+              Codigo de sala: <span className="App-game-waitroom-form-subtitle-code">{roomCode}</span>
+            </div>
+            <div className="App-game-waitroom-form-subtitle">
               Jugadores
             </div>
             <div className="App-game-waitroom-form-list">
               {
                 players.map((player) =>
-                  <span>{player.name}</span>
+                  <span key={player.id}>{player.name}</span>
                 )
               }
             </div>
