@@ -1,38 +1,339 @@
 .App {
-  text-align: center;
-}
-
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
   display: flex;
-  flex-direction: column;
+  flex-flow: column;
+  justify-content: flex-start;
   align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
+
+  max-height: 100vh;
+  min-height: 100vh;
+
+  background-color: #282c34;
   color: white;
 }
 
-.App-link {
-  color: #61dafb;
+.App-header {
+  display: flex;
+  justify-content: center;
+
+  width: 100%;
+
+  padding-bottom: 8px;
+
+  font-size: 2.5rem;
+  font-weight: 500;
+
+  background-color: #324266;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.App-footer {
+  display: flex;
+  justify-content: center;
+
+  width: 100%;
+
+  padding-bottom: 2px;
+
+  font-size: 1.0rem;
+  font-weight: 500;
+
+  background-color: #324266;
+}
+
+.App-content {
+  display: flex;
+  flex: 1 1 auto;
+
+  height: 100%;
+  width: min(100%,1200px);
+  margin-top: 10px;
+  margin-bottom: 10px;
+
+  text-align: center;
+  justify-content: center;
+
+  background-color: #000;
+}
+
+/* 
+* Game Menu 
+*/
+
+.App-game-menu {
+  display: flex;
+
+  width: 100%;
+}
+
+.App-game-menu-option {
+  display: flex;
+
+  width: 100%;
+  margin: 5px;
+}
+
+.App-game-menu-option-button {
+  width: 100%;
+
+  outline: none;
+  border: 0 none;
+  border-radius: 50px;
+
+  margin-top: 0px;
+  margin-left: 0px;
+
+  font-size: 1.5rem;
+  font-weight: 500;
+  
+  color: #ddd;
+  background-color: #3e5bda;
+  box-shadow: inset -8px -6px 0px 0px #999;
+}
+
+.App-game-menu-option-button:hover {
+  color: #eee;
+  background-color: rgb(103, 128, 240);
+}
+
+.App-game-menu-option-button:active {
+  margin-top: 8px;
+  margin-left: 6px;
+
+  color: #fff;
+  background-color: #5973eb;
+  box-shadow: inset 0px 0px 0px 0px #999;
+}
+
+/* 
+* Game Option 
+*/
+
+.App-game-option {
+  display: flex;
+  justify-content: flex-start;
+  flex-direction: column;
+  align-items: center;
+
+  width: 100%;
+  margin: 5px;
+}
+
+.App-game-option-back {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: flex-start;
+
+  width: 100%;
+}
+
+.App-game-option-back-button {
+  padding: 10px;
+
+  outline: none;
+  border: 0 none;
+  border-radius: 10px;
+
+  margin-top: 0px;
+  margin-left: 0px;
+
+  font-size: 1.0rem;
+  font-weight: 500;
+  
+  color: #ddd;
+  background-color: #a70000;
+  box-shadow: inset -2px -2px 0px 0px #999;
+}
+
+.App-game-option-back-button:hover {
+  color: #eee;
+  background-color: #cc0000;
+}
+
+.App-game-option-back-button:active {
+  margin-top: 2px;
+  margin-left: 2px;
+  margin-right: -2px;
+  margin-bottom: -2px;
+
+  color: #fff;
+  background-color: #ff0000;
+  box-shadow: inset 0px 0px 0px 0px #999;
+}
+
+.App-game-option-form {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  flex: 1 1 auto;
+}
+
+.App-game-option-form-title {
+  font-size: 1.5rem;
+  font-weight: 500;
+
+  margin-bottom: 20px;
+
+  color: #fff;
+}
+
+.App-game-option-form-input {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.App-game-option-form-input-label {
+  font-size: 1.0rem;
+  font-weight: 500;
+
+  color: #fff;
+}
+
+.App-game-option-form-content {
+  margin-top: 20px;
+}
+
+.App-game-option-form-button {
+  width: 240px;
+
+  outline: none;
+  border: 0 none;
+  border-radius: 10px;
+
+  margin-top: 0px;
+  margin-left: 0px;
+
+  font-size: 1.5rem;
+  font-weight: 500;
+  
+  color: #ddd;
+  background-color: #20b112;
+  box-shadow: inset -2px -2px 0px 0px #999;
+}
+
+.App-game-option-form-button:hover {
+  color: #eee;
+  background-color: #25ce15;
+}
+
+.App-game-option-form-button:active {
+  margin-top: 2px;
+  margin-left: 2px;
+  margin-right: -2px;
+  margin-bottom: -2px;
+
+  color: #fff;
+  background-color: #4bda3e;
+  box-shadow: inset 0px 0px 0px 0px #999;
+}
+
+.App-game-option-form-button:disabled {
+  color: #b3b3b3;
+  background-color: #353535;
+  box-shadow: inset 0px 0px 0px 0px #999;
+}
+
+/* 
+* Game Room 
+*/
+
+.App-game-waitroom {
+  display: flex;
+
+  width: 100%;
+}
+
+
+.App-game-waitroom-form {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+
+  width: 100%;
+}
+
+.App-game-waitroom-form-title {
+  font-size: 1.5rem;
+  font-weight: 500;
+
+  margin-top: 20px;
+  margin-bottom: 20px;
+
+  color: #fff;
+}
+
+.App-game-waitroom-form-subtitle {
+  font-size: 1.0rem;
+  font-weight: 500;
+
+  margin-bottom: 12px;
+
+  color: #fff;
+}
+
+.App-game-waitroom-form-list {
+  display: flex;
+  justify-content: flex-start;
+  flex-direction: column;
+  align-items: center;
+  flex: 1 1 auto;
+
+  width: 320px;
+
+  background-color: #282c34;
+}
+
+.App-game-waitroom-form-input-label {
+  font-size: 1.0rem;
+  font-weight: 500;
+
+  color: #fff;
+}
+
+.App-game-waitroom-form-actions {
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+.App-game-waitroom-form-button {
+  width: 240px;
+
+  outline: none;
+  border: 0 none;
+  border-radius: 10px;
+
+  margin-top: 0px;
+  margin-left: 0px;
+
+  font-size: 1.5rem;
+  font-weight: 500;
+  
+  color: #ddd;
+  background-color: #20b112;
+  box-shadow: inset -2px -2px 0px 0px #999;
+}
+
+.App-game-waitroom-form-button:hover {
+  color: #eee;
+  background-color: #25ce15;
+}
+
+.App-game-waitroom-form-button:active {
+  margin-top: 2px;
+  margin-left: 2px;
+  margin-right: -2px;
+  margin-bottom: -2px;
+
+  color: #fff;
+  background-color: #4bda3e;
+  box-shadow: inset 0px 0px 0px 0px #999;
+}
+
+.App-game-waitroom-form-button:disabled {
+  color: #b3b3b3;
+  background-color: #353535;
+  box-shadow: inset 0px 0px 0px 0px #999;
 }
