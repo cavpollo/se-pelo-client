@@ -185,6 +185,8 @@
 }
 
 .App-game-option-form-input-label {
+  margin-top: 12px;
+
   font-size: 1.0rem;
   font-weight: 500;
 
@@ -192,7 +194,7 @@
 }
 
 .App-game-option-form-content {
-  margin-top: 20px;
+  margin-top: 36px;
 }
 
 .App-game-option-form-button {
@@ -291,6 +293,10 @@
   margin-bottom: 20px;
 
   background-color: #282c34;
+}
+
+.App-game-waitroom-form-list-lag {
+  color: #cfcfcf;
 }
 
 .App-game-waitroom-form-input-label {
