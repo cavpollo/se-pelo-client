@@ -291,11 +291,11 @@ export function ContentWait({ setContent, isPollingRef, roomId, roomCode, player
         <div className="App-game-waitroom-form-list">
           {
             players.map((player) => {
-              if (player.last_check < 10) {
-                return <span key={player.id}>{ player.is_owner ? '👑' : '' } {player.name} 🟢</span>
-              } else {
-                return <em key={player.id} className="App-game-waitroom-form-list-lag">{ player.is_owner ? '👑' : '' } {player.name} 💤</em>
-              }
+              return <span key={player.id}>
+                <PartyOwner isOwner={player.is_owner} />&nbsp; 
+                <PlayerName player_name={player.name} last_check={player.last_check} />&nbsp; 
+                <PlayerStatus last_check={player.last_check} />
+              </span>
             })
           }
         </div>
@@ -303,6 +303,38 @@ export function ContentWait({ setContent, isPollingRef, roomId, roomCode, player
       </div>
     </div>
   );
+}
+
+export function PartyOwner({ isOwner }) {
+  if (isOwner) {
+    return (
+      <span title="Dueño de la partida">🎩</span>
+    );
+  } else {
+    return;
+  }
+}
+
+export function PlayerName({ player_name, last_check }) {
+  if (last_check < 10) {
+    return player_name;
+  } else {
+    return (
+      <em className="App-game-waitroom-form-list-lag">{player_name}</em>
+    );
+  }
+}
+
+export function PlayerStatus({ last_check }) {
+  if (last_check < 10) {
+    return (
+      <span title="Usuario activo">🟢</span>
+    );
+  } else {
+    return (
+      <span title="Usuario inactivo">💤</span>
+    );
+  }
 }
 
 export function GameStartButton({ isOwner, playerId, roomId, players }) {
