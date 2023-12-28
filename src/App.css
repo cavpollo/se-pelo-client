@@ -51,11 +51,12 @@
   text-align: center;
   justify-content: center;
 
+  border-radius: 16px 16px 16px 16px;
   background-color: #000;
 }
 
-/* 
-* Game Menu 
+/*
+* Game Menu
 */
 
 .App-game-menu {
@@ -83,7 +84,7 @@
 
   font-size: 1.5rem;
   font-weight: 500;
-  
+
   color: #ddd;
   background-color: #3e5bda;
   box-shadow: inset -8px -6px 0px 0px #999;
@@ -103,8 +104,8 @@
   box-shadow: inset 0px 0px 0px 0px #999;
 }
 
-/* 
-* Game Option 
+/*
+* Game Option
 */
 
 .App-game-option {
@@ -138,7 +139,7 @@
 
   font-size: 1.0rem;
   font-weight: 500;
-  
+
   color: #ddd;
   background-color: #a70000;
   box-shadow: inset -2px -2px 0px 0px #999;
@@ -209,7 +210,7 @@
 
   font-size: 1.5rem;
   font-weight: 500;
-  
+
   color: #ddd;
   background-color: #20b112;
   box-shadow: inset -2px -2px 0px 0px #999;
@@ -237,8 +238,8 @@
   box-shadow: inset 0px 0px 0px 0px #999;
 }
 
-/* 
-* Game Room 
+/*
+* Game Room
 */
 
 .App-game-waitroom {
@@ -346,7 +347,7 @@
 
   font-size: 1.5rem;
   font-weight: 500;
-  
+
   color: #ddd;
   background-color: #20b112;
   box-shadow: inset -2px -2px 0px 0px #999;
@@ -372,4 +373,129 @@
   color: #b3b3b3;
   background-color: #353535;
   box-shadow: inset 0px 0px 0px 0px #999;
+}
+
+.App-game-gameroom {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+
+  width: 100%;
+}
+
+.App-game-gameroom-header {
+  display: flex;
+  justify-content: space-between;
+  flex-direction: row;
+  align-items: center;
+
+  width: 100%;
+
+  border-radius: 16px 16px 0px 0px;
+  background-color: #0030a0;
+}
+
+.App-game-gameroom-header-element {
+
+  width: 33.3%;
+
+  padding: 8px;
+}
+
+.App-game-gameroom-header-element-roomcode {
+  display: flex;
+  flex-direction: row;
+}
+
+.App-game-gameroom-header-element-time {
+  display: flex;
+  flex-direction: row-reverse;
+}
+
+.App-game-gameroom-header-code {
+  font-weight: 750;
+
+  color: #ff0000;
+}
+
+.App-game-gameroom-content {
+  display: flex;
+  justify-content: flex-start;
+  flex-direction: column;
+  align-items: flex-end;
+  flex: 1 1 auto;
+
+  width: 100%;
+}
+
+.App-game-gameroom-content-playerslist {
+  position: absolute;
+}
+
+.App-game-gameroom-content-playerslist-inner {
+  display: flex;
+  justify-content: flex-start;
+  flex-direction: column;
+  align-items: center;
+
+  width: 240px;
+}
+
+.App-game-gameroom-content-playerslist-inner-title {
+  width: 100%;
+
+  background-color: #4d5463;
+}
+
+.App-game-gameroom-content-playerslist-inner-title-inner {
+  font-size: 1.0rem;
+  font-weight: 500;
+
+  padding: 8px;
+}
+
+.App-game-gameroom-content-playerslist-inner-list {
+  display: flex;
+
+  width: 100%;
+
+  background-color: #282c34;
+}
+
+.App-game-gameroom-content-playerslist-inner-list-inner {
+  display: flex;
+  justify-content: flex-start;
+  flex-direction: column;
+  align-items: center;
+  flex: 1 1 auto;
+
+  width: 100%;
+  padding: 8px;
+}
+
+.App-game-gameroom-content-game {
+  display: flex;
+  justify-content: flex-start;
+  flex-direction: column;
+  align-items: center;
+  flex: 1 1 auto;
+
+  width: 100%;
+}
+
+.App-game-gameroom-footer {
+  display: flex;
+  justify-content: center;
+  flex-direction: row;
+  align-items: center;
+
+  width: 100%;
+
+  border-radius: 0px 0px 16px 16px;
+  background-color: #0030a0;
+}
+
+.App-game-gameroom-footer-message {
+  padding: 4px;
 }
