@@ -176,11 +176,18 @@ export function ContentJoin({ setContent, setRoomId, roomCode, setRoomCode, setP
       console.log(response);
 
       if (!response.ok || response.status !== 200) {
-        console.error("Invalid status " + response.status);
+        if (response.status === 404) {
+          //TODO: we need a better system...
+          alert('No existe la partida con el código especificado. Revisa tener el código correcto.');
 
-        alert('¡Ha ocurrido un error! Chequea tu conexión y vuelve a intentarlo, o quejate con el administrador.');
+          setJoinGameButtonEnabled(true);
+        } else {
+          console.error("Invalid status " + response.status);
 
-        setJoinGameButtonEnabled(true);
+          alert('¡Ha ocurrido un error! Chequea tu conexión y vuelve a intentarlo, o quejate con el administrador.');
+
+          setJoinGameButtonEnabled(true);
+        }
       } else {
         const jsonResponse = await response.json();
 
