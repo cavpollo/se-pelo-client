@@ -65,6 +65,8 @@ export function ContentCreate({ setContent, setRoomId, setRoomCode, setPlayerId,
   const [ownerName, setOwnerName] = useState('');
   const [createGameButtonEnabled, setCreateGameButtonEnabled] = useState(true);
 
+  //TODO: Reload Name and RoomCode from cache?
+
   const ownerNameValid = (ownerName) => {
     return ownerName && ownerName.trim().length > 0 && ownerName.trim().length <= 16;
   }
@@ -87,18 +89,30 @@ export function ContentCreate({ setContent, setRoomId, setRoomCode, setPlayerId,
         },
         body: JSON.stringify(request)
       });
-      const jsonResponse = await response.json();
+        
+      console.log(response);
+
+      if (!response.ok || response.status != 201) {
+        console.error("Invalid status " + response.status);
       
-      console.log(jsonResponse);
+        alert('¡Ha ocurrido un error! Chequea tu conexión y vuelve a intentarlo, o quejate con el administrador.');
+  
+        setCreateGameButtonEnabled(true);
+      } else {
+        const jsonResponse = await response.json();
+        
+        console.log(jsonResponse);
 
-      setRoomCode(jsonResponse['room_code']);
-      setRoomId(jsonResponse['room_id']);
-      setPlayerId(jsonResponse['player_id']);
-      setOwner(true);
+        setRoomCode(jsonResponse['room_code']);
+        setRoomId(jsonResponse['room_id']);
+        setPlayerId(jsonResponse['player_id']);
+        setOwner(true);
 
-      setContent('wait');
+        setContent('wait');
+      }
     } catch (error) {
       console.error(error);
+
       alert('¡Ha ocurrido un error! Chequea tu conexión y vuelve a intentarlo, o quejate con el administrador.');
 
       setCreateGameButtonEnabled(true);
@@ -136,6 +150,8 @@ export function ContentJoin({ setContent, setRoomId, roomCode, setRoomCode, setP
   const [playerName, setPlayerName] = useState('');
   const [joinGameButtonEnabled, setJoinGameButtonEnabled] = useState(true);
 
+  //TODO: Reload Name and RoomCode from cache?
+
   const playerNameValid = (playerName) => {
     return playerName && playerName.trim().length > 0 && playerName.trim().length <= 16;
   }
@@ -163,17 +179,30 @@ export function ContentJoin({ setContent, setRoomId, roomCode, setRoomCode, setP
         },
         body: JSON.stringify(request)
       });
-      const jsonResponse = await response.json();
+        
+      console.log(response);
+
+      if (!response.ok || response.status != 200) {
+        console.error("Invalid status " + response.status);
       
-      console.log(jsonResponse);
+        alert('¡Ha ocurrido un error! Chequea tu conexión y vuelve a intentarlo, o quejate con el administrador.');
+  
+        setJoinGameButtonEnabled(true);
+      } else {
+        const jsonResponse = await response.json();
+        
+        console.log(jsonResponse);
 
-      setRoomId(jsonResponse['room_id']);
-      setPlayerId(jsonResponse['player_id']);
-      setOwner(false);
+        setRoomId(jsonResponse['room_id']);
+        setPlayerId(jsonResponse['player_id']);
+        setOwner(false);
 
-      setContent('wait');
+        setContent('wait');
+      }
     } catch (error) {
       console.error(error);
+
+      //TODO: I know, duplicated code:
       alert('¡Ha ocurrido un error! Chequea tu conexión y vuelve a intentarlo, o quejate con el administrador.');
 
       setJoinGameButtonEnabled(true);
@@ -212,6 +241,8 @@ export function ContentJoin({ setContent, setRoomId, roomCode, setRoomCode, setP
 }
 
 export function ContentWait({ setContent, isPollingRef, roomId, roomCode, playerId, isOwner, players, setPlayers }) {  
+  const timeoutFailuresRef = useRef(0);
+
   const toPlayer = (jsonPlayer) => {
     return {
       'id': jsonPlayer['player_id'], 
@@ -222,8 +253,7 @@ export function ContentWait({ setContent, isPollingRef, roomId, roomCode, player
   }
 
   const waitingRoomPollFrequencyInMs = 1000;
-  const waitingRoomPollFailureInMs = 1000; //10 * 1000;
-  let timeoutFailures = 0;
+  const waitingRoomPollFailureInMs = 10000; //10 * 1000;
   const pollWaitingRoom = useCallback(async () => {
     const request = {
       room_id: roomId,
@@ -241,25 +271,48 @@ export function ContentWait({ setContent, isPollingRef, roomId, roomCode, player
         },
         body: JSON.stringify(request)
       });
-      const jsonResponse = await response.json();
-      
-      console.log(jsonResponse);
+        
+      //console.log(response);
 
-      if (jsonResponse['room_status'] == 'PLAYING') {
-        setContent('game');
+      if (!response.ok || response.status != 201) {
+        console.error("Invalid status " + response.status);
+
+        alert('¡Ha ocurrido un error! Chequea tu conexión y vuelve a intentarlo, o quejate con el administrador.');
+  
+        timeoutFailuresRef.current += waitingRoomPollFrequencyInMs;
+
+        console.info(timeoutFailuresRef.current + ' >= ' + waitingRoomPollFailureInMs + ' => '(timeoutFailuresRef.current >= waitingRoomPollFailureInMs));
+        if (timeoutFailuresRef.current >= waitingRoomPollFailureInMs) {
+          alert('¡Ha ocurrido un error! Chequea tu conexión, o quejate con el administrador.');
+
+          //TODO: Somehow show visual feedback of a lack of connection.
+          setContent('menu');
+        } else {
+          setTimeout(pollWaitingRoom, waitingRoomPollFrequencyInMs);
+        }
       } else {
-        const parsed_players = jsonResponse['players'].map(toPlayer);
-        setPlayers(parsed_players);
+        const jsonResponse = await response.json();
+        
+        //console.log(jsonResponse);
 
-        timeoutFailures = 0;
-        setTimeout(pollWaitingRoom, waitingRoomPollFrequencyInMs);
+        if (jsonResponse['room_status'] === 'WAITING') {
+          const parsed_players = jsonResponse['players'].map(toPlayer);
+          setPlayers(parsed_players);
+
+          timeoutFailuresRef.current = 0;
+          setTimeout(pollWaitingRoom, waitingRoomPollFrequencyInMs);
+        } else {
+          setContent('game');
+        }
       }
     } catch (error) {
       console.error(error);
 
-      timeoutFailures = timeoutFailures + waitingRoomPollFrequencyInMs;
+      //TODO: I know, duplicated code:
+      timeoutFailuresRef.current += waitingRoomPollFrequencyInMs;
 
-      if (timeoutFailures >= waitingRoomPollFailureInMs) {
+      console.info(timeoutFailuresRef.current + ' >= ' + waitingRoomPollFailureInMs + ' => ' + (timeoutFailuresRef.current >= waitingRoomPollFailureInMs));
+      if (timeoutFailuresRef.current >= waitingRoomPollFailureInMs) {
         alert('¡Ha ocurrido un error! Chequea tu conexión, o quejate con el administrador.');
 
         //TODO: Somehow show visual feedback of a lack of connection.
@@ -299,6 +352,7 @@ export function ContentWait({ setContent, isPollingRef, roomId, roomCode, player
             })
           }
         </div>
+        <GameStartWarning players={players} />
         <GameStartButton isOwner={isOwner} playerId={playerId} roomId={roomId} players={players} />
       </div>
     </div>
@@ -337,6 +391,22 @@ export function PlayerStatus({ last_check }) {
   }
 }
 
+export function GameStartWarning({ players }) {
+  if (players.length >= 3) {
+    return;
+  } else {
+    return (
+      <div className="App-game-waitroom-form-warning">
+        <div>⚠️</div>
+        <div className="App-game-waitroom-form-warning-text">
+           Se necesitan almenos 3 jugadores para iniciar la partida.
+        </div>
+        <div>⚠️</div>
+      </div>
+    );
+  }
+}
+
 export function GameStartButton({ isOwner, playerId, roomId, players }) {
   const [startGameButtonEnabled, setStartGameButtonEnabled] = useState(true);
 
@@ -349,7 +419,7 @@ export function GameStartButton({ isOwner, playerId, roomId, players }) {
   }
 
   const playerCountValid = (players) => {
-    return players.length > 1;
+    return players.length >= 3;
   }
 
   const startGame = useCallback(async () => {
@@ -373,8 +443,18 @@ export function GameStartButton({ isOwner, playerId, roomId, players }) {
       });
       
       console.log(response);
+
+      if (!response.ok || response.status != 204) {
+        console.error("Invalid status " + response.status);
+
+        alert('¡Ha ocurrido un error! Chequea tu conexión y vuelve a intentarlo, o quejate con el administrador.');
+  
+        setStartGameButtonEnabled(true);
+      }
     } catch (error) {
       console.error(error);
+
+      //TODO: I know, duplicated code:
       alert('¡Ha ocurrido un error! Chequea tu conexión y vuelve a intentarlo, o quejate con el administrador.');
 
       setStartGameButtonEnabled(true);
@@ -384,10 +464,10 @@ export function GameStartButton({ isOwner, playerId, roomId, players }) {
   if (isOwner) {
     return (
       <div className="App-game-waitroom-form-actions">
-          <button className="App-game-waitroom-form-button" type="button" disabled={!startGameButtonEnabled || !playerIdValid(playerId) || !roomIdValid(roomId) || !playerCountValid(players)} onClick={startGame}>
-            Iniciar la partida
-          </button>
-        </div>
+        <button className="App-game-waitroom-form-button" type="button" disabled={!startGameButtonEnabled || !playerIdValid(playerId) || !roomIdValid(roomId) || !playerCountValid(players)} onClick={startGame}>
+          Iniciar la partida
+        </button>
+      </div>
     );
   } else {
     return;
