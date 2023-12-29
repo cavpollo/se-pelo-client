@@ -738,7 +738,7 @@ export function ContentGame({ setContent, roomId, roomCode, playerId }) {
         </div>
         <div className="App-game-gameroom-header-element App-game-gameroom-header-element-phase">
           <span>Fase:&nbsp;</span>
-          <GameStatus status={roomStatus} isLeader={playerId === leaderId} isOwner={playerId === ownerId} />
+          <GameStatus status={roomStatus} isLeader={playerId === leaderId} isOwner={playerId === ownerId} waitingForDataSubmit={waitingForDataSubmit} />
         </div>
         <div className="App-game-gameroom-header-element App-game-gameroom-header-element-time">
           Tiempo: ∞
@@ -777,14 +777,14 @@ export function ContentGame({ setContent, roomId, roomCode, playerId }) {
       </div>
       <div className="App-game-gameroom-footer">
         <div className="App-game-gameroom-footer-message">
-          <Instruction status={roomStatus} optionsFound={options.length > 0} isLeader={playerId === leaderId} isOwner={playerId === ownerId} isGameEnd={roundCount === roundTotal} />
+          <Instruction status={roomStatus} optionsFound={options.length > 0} isLeader={playerId === leaderId} isOwner={playerId === ownerId} isGameEnd={roundCount === roundTotal} waitingForDataSubmit={waitingForDataSubmit} />
         </div>
       </div>
     </div>
   );
 }
 
-export function GameStatus({ status, isLeader, isOwner }) {
+export function GameStatus({ status, isLeader, isOwner, waitingForDataSubmit }) {
   let phase = 'Cargando';
   let active = false;
   switch(status) {
@@ -796,7 +796,7 @@ export function GameStatus({ status, isLeader, isOwner }) {
       break;
     case 'LACKEY_OPTIONS':
       phase = 'Remate';
-      if (!isLeader) {
+      if (!isLeader && !waitingForDataSubmit) {
         active = true;
       }
       break;
@@ -931,13 +931,17 @@ export function Options({ roomId, playerId, waitingForDataSubmit, setWaitingForD
   }
 
   if (options.length > 0 && showOptions) {
+    const choicesClass = 'App-game-gameroom-content-game-choices' + (isLeader ? ' App-game-gameroom-content-game-choices-prompt' : ' App-game-gameroom-content-game-choices-finisher');
     return (
-      <div>
+      <div className={choicesClass}>
         {
           options.map((option) => {
-            return <div key={option.id}>
-              <button className="App-game-gameroom-content-game-choice" type="button" disabled={waitingForDataSubmit} onClick={_ => pickOption(option.id)}>
-                {option.id} - {option.text}
+            const optionClass = 'App-game-gameroom-content-game-choices-choice-button' +
+              (waitingForDataSubmit ? '-disabled ' : ' ') +
+              (isLeader ? ' App-game-gameroom-content-game-choices-choice-button-prompt' : ' App-game-gameroom-content-game-choices-choice-button-finisher');
+            return <div key={option.id} className="App-game-gameroom-content-game-choices-choice">
+              <button className={optionClass} type="button" disabled={waitingForDataSubmit} onClick={_ => pickOption(option.id)}>
+                {option.text}
               </button>
             </div>
           })
@@ -988,8 +992,6 @@ export function NextRoundButton({ roomId, playerId, waitingForDataSubmit, setWai
     }
   }, [setWaitingForDataSubmit]);
 
-
-
   if (isOwner && status === 'NOTIFY_WINNER') {
     return (
       <div className="App-game-gameroom-content-game-nextround">
@@ -1003,7 +1005,7 @@ export function NextRoundButton({ roomId, playerId, waitingForDataSubmit, setWai
   }
 }
 
-export function Instruction({ status, optionsFound, isLeader, isOwner, isGameEnd }) {
+export function Instruction({ status, optionsFound, isLeader, isOwner, isGameEnd, waitingForDataSubmit }) {
   let instruction = 'Espere por favor';
   let active = false;
   switch(status) {
@@ -1024,8 +1026,12 @@ export function Instruction({ status, optionsFound, isLeader, isOwner, isGameEnd
         instruction = 'Esperando a que los secuaces seleccionen una remate';
       } else {
         if (optionsFound) {
-          active = true;
-          instruction = 'Selecciona un remate para que lo vea el lider.';
+          if (waitingForDataSubmit) {
+            instruction = 'Esperando a que los otros secuaces envien su remate.';
+          } else {
+            active = true;
+            instruction = 'Selecciona un remate para que lo vea el lider.';
+          }
         } else {
           instruction = 'Obteniendo remates';
         }
