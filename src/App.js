@@ -520,7 +520,7 @@ export function ContentGame({ setContent, roomId, roomCode, playerId }) {
   const timeoutFailuresRef = useRef(-1);
   const alreadyPolledRef = useRef(false);
   // const renderRef = useRef(0);
-  const pollRef = useRef(0);
+  // const pollRef = useRef(0);
 
   const waitingRoomPollFrequencyInMs = 1000;
   const waitingRoomPollFailureInMs = 10000; //10 * 1000;
@@ -584,8 +584,9 @@ export function ContentGame({ setContent, roomId, roomCode, playerId }) {
     };
   }
 
-  const toFinisher = (jsonFinisher) => {
+  const toFinisher = (jsonFinisher, index) => {
     return {
+      'index': index,
       'player_name': jsonFinisher['player_name'],
       'finisher_text': jsonFinisher['finisher_text'],
       'is_winner': (jsonFinisher['is_winner'])
@@ -595,8 +596,8 @@ export function ContentGame({ setContent, roomId, roomCode, playerId }) {
   useEffect(() => {
 
     async function pollWaitingRoom() {
-      pollRef.current++;
-      console.log('pollWaitingRoom ' + pollRef.current);
+      // pollRef.current++;
+      // console.log('pollWaitingRoom ' + pollRef.current);
 
       const request = {
         room_id: roomId,
@@ -667,7 +668,7 @@ export function ContentGame({ setContent, roomId, roomCode, playerId }) {
 
           const responseRoomStatus = jsonResponse['room_status'];
           if (roomStatusRef.current !== responseRoomStatus) {
-            console.log(responseRoomStatus);
+            // console.log(responseRoomStatus);
 
             roomStatusRef.current = responseRoomStatus;
             setRoomStatus(responseRoomStatus);
@@ -846,7 +847,7 @@ export function Finishers({ finishers }) {
         {
           finishers.map((finisher) => {
             const finisherClasses = 'App-game-gameroom-content-game-finishers-finisher' + (finisher.is_winner ? ' App-game-gameroom-content-game-finishers-finisher-border' : '');
-            return <div className={finisherClasses}>
+            return <div key={finisher.index} className={finisherClasses}>
                 { finisher.is_winner ? <div className="App-game-gameroom-content-game-finishers-finisher-star" title="Ganador">⭐</div> : '' }
                 <div className="App-game-gameroom-content-game-finishers-finisher-inner">
                   <div className="App-game-gameroom-content-game-finishers-finisher-inner-text">
@@ -865,7 +866,6 @@ export function Finishers({ finishers }) {
     return;
   }
 }
-
 
 export function Options({ roomId, playerId, waitingForDataSubmit, setWaitingForDataSubmit, options, status, isLeader }) {
   const pickOption = useCallback(async (optionId) => {
