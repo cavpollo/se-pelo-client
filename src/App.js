@@ -793,43 +793,43 @@ export function GameStatus({ status, isLeader, isOwner }) {
 }
 
 export function Instruction({ status, optionsFound, isLeader, isOwner }) {
-  let instruction = 'Espere por favor...';
+  let instruction = 'Espere por favor';
   let active = false;
   switch(status) {
     case 'LEADER_OPTIONS':
       if (isLeader) {
-        active = true;
         if (optionsFound) {
+          active = true;
           instruction = 'Selecciona una inspiracion para los secuaces.';
         } else {
-          instruction = 'Obteniendo inspiraciones...';
+          instruction = 'Obteniendo inspiraciones';
         }
       } else {
-        instruction = 'Esperando a que el lider selccione una inspiracion...'
+        instruction = 'Esperando a que el lider selccione una inspiracion'
       }
       break;
     case 'LACKEY_OPTIONS':
       if (isLeader) {
-        instruction = 'Esperando a que los secuaces seleccionen una remate...';
+        instruction = 'Esperando a que los secuaces seleccionen una remate';
       } else {
-        active = true;
         if (optionsFound) {
+          active = true;
           instruction = 'Selecciona un remate para el lider.';
         } else {
-          instruction = 'Obteniendo remates...';
+          instruction = 'Obteniendo remates';
         }
       }
       break;
     case 'LEADER_PICK':
       if (isLeader) {
-        active = true;
         if (optionsFound) {
-          instruction = 'Obteniendo remates...';
+          instruction = 'Obteniendo remates';
         } else {
+          active = true;
           instruction = 'Selecciona el remate ganador.';
         }
       } else {
-        instruction = 'Esperando a que el lider selccione un remate ganador...'
+        instruction = 'Esperando a que el lider selccione un remate ganador'
       }
       break;
     case 'NOTIFY_WINNER':
@@ -837,7 +837,7 @@ export function Instruction({ status, optionsFound, isLeader, isOwner }) {
         active = true;
         instruction = 'Inicia una nueva ronda para continuar jugando.';
       } else {
-        instruction = 'Espere a que el dueño de la partida inicie una nueva ronda...';
+        instruction = 'Espere a que el dueño de la partida inicie una nueva ronda';
       }
       break;
     default:
