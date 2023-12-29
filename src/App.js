@@ -75,10 +75,10 @@ export function ContentCreate({ setContent, setRoomId, setRoomCode, setPlayerId 
     console.log(request);
 
     try {
-      const response = await fetch("http://game.local:8000/room-create", {
+      const response = await fetch(process.env.REACT_APP_SERVER_BASE_URL + "/room-create", {
         method: "POST",
         headers: {
-          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Origin": process.env.REACT_APP_ACCESS_CONTROL_ALLOW_ORIGIN,
           "Content-type": "application/json; charset=UTF-8"
         },
         body: JSON.stringify(request)
@@ -164,10 +164,10 @@ export function ContentJoin({ setContent, setRoomId, roomCode, setRoomCode, setP
     console.log(request);
 
     try {
-      const response = await fetch("http://game.local:8000/room-join", {
+      const response = await fetch(process.env.REACT_APP_SERVER_BASE_URL + "/room-join", {
         method: "POST",
         headers: {
-          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Origin": process.env.REACT_APP_ACCESS_CONTROL_ALLOW_ORIGIN,
           "Content-type": "application/json; charset=UTF-8"
         },
         body: JSON.stringify(request)
@@ -273,10 +273,10 @@ export function ContentWait({ setContent, roomId, roomCode, playerId }) {
       // console.log(request);
 
       try {
-        const response = await fetch("http://game.local:8000/room-check", {
+        const response = await fetch(process.env.REACT_APP_SERVER_BASE_URL + "/room-check", {
           method: "POST",
           headers: {
-            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Origin": process.env.REACT_APP_ACCESS_CONTROL_ALLOW_ORIGIN,
             "Content-type": "application/json; charset=UTF-8"
           },
           body: JSON.stringify(request)
@@ -459,10 +459,10 @@ export function GameStartButton({ isOwner, playerId, roomId, players }) {
     console.log(request);
 
     try {
-      const response = await fetch("http://game.local:8000/game-start", {
+      const response = await fetch(process.env.REACT_APP_SERVER_BASE_URL + "/game-start", {
         method: "POST",
         headers: {
-          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Origin": process.env.REACT_APP_ACCESS_CONTROL_ALLOW_ORIGIN,
           "Content-type": "application/json; charset=UTF-8"
         },
         body: JSON.stringify(request)
@@ -520,7 +520,7 @@ export function ContentGame({ setContent, roomId, roomCode, playerId }) {
   const timeoutFailuresRef = useRef(-1);
   const alreadyPolledRef = useRef(false);
   // const renderRef = useRef(0);
-  const pollRef = useRef(0);
+  // const pollRef = useRef(0);
 
   const waitingRoomPollFrequencyInMs = 1000;
   const waitingRoomPollFailureInMs = 10000; //10 * 1000;
@@ -542,10 +542,10 @@ export function ContentGame({ setContent, roomId, roomCode, playerId }) {
     console.log(request);
 
     try {
-      const response = await fetch("http://game.local:8000/game-options", {
+      const response = await fetch(process.env.REACT_APP_SERVER_BASE_URL + "/game-options", {
         method: "POST",
         headers: {
-          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Origin": process.env.REACT_APP_ACCESS_CONTROL_ALLOW_ORIGIN,
           "Content-type": "application/json; charset=UTF-8"
         },
         body: JSON.stringify(request)
@@ -584,8 +584,9 @@ export function ContentGame({ setContent, roomId, roomCode, playerId }) {
     };
   }
 
-  const toFinisher = (jsonFinisher) => {
+  const toFinisher = (jsonFinisher, index) => {
     return {
+      'index': index,
       'player_name': jsonFinisher['player_name'],
       'finisher_text': jsonFinisher['finisher_text'],
       'is_winner': (jsonFinisher['is_winner'])
@@ -595,8 +596,8 @@ export function ContentGame({ setContent, roomId, roomCode, playerId }) {
   useEffect(() => {
 
     async function pollWaitingRoom() {
-      pollRef.current++;
-      console.log('pollWaitingRoom ' + pollRef.current);
+      // pollRef.current++;
+      // console.log('pollWaitingRoom ' + pollRef.current);
 
       const request = {
         room_id: roomId,
@@ -606,10 +607,10 @@ export function ContentGame({ setContent, roomId, roomCode, playerId }) {
       // console.log(request);
 
       try {
-        const response = await fetch("http://game.local:8000/room-check", {
+        const response = await fetch(process.env.REACT_APP_SERVER_BASE_URL + "/room-check", {
           method: "POST",
           headers: {
-            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Origin": process.env.REACT_APP_ACCESS_CONTROL_ALLOW_ORIGIN,
             "Content-type": "application/json; charset=UTF-8"
           },
           body: JSON.stringify(request)
@@ -667,7 +668,7 @@ export function ContentGame({ setContent, roomId, roomCode, playerId }) {
 
           const responseRoomStatus = jsonResponse['room_status'];
           if (roomStatusRef.current !== responseRoomStatus) {
-            console.log(responseRoomStatus);
+            // console.log(responseRoomStatus);
 
             roomStatusRef.current = responseRoomStatus;
             setRoomStatus(responseRoomStatus);
@@ -846,7 +847,7 @@ export function Finishers({ finishers }) {
         {
           finishers.map((finisher) => {
             const finisherClasses = 'App-game-gameroom-content-game-finishers-finisher' + (finisher.is_winner ? ' App-game-gameroom-content-game-finishers-finisher-border' : '');
-            return <div className={finisherClasses}>
+            return <div key={finisher.index} className={finisherClasses}>
                 { finisher.is_winner ? <div className="App-game-gameroom-content-game-finishers-finisher-star" title="Ganador">⭐</div> : '' }
                 <div className="App-game-gameroom-content-game-finishers-finisher-inner">
                   <div className="App-game-gameroom-content-game-finishers-finisher-inner-text">
@@ -866,7 +867,6 @@ export function Finishers({ finishers }) {
   }
 }
 
-
 export function Options({ roomId, playerId, waitingForDataSubmit, setWaitingForDataSubmit, options, status, isLeader }) {
   const pickOption = useCallback(async (optionId) => {
     setWaitingForDataSubmit(true);
@@ -880,10 +880,10 @@ export function Options({ roomId, playerId, waitingForDataSubmit, setWaitingForD
     console.log(request);
 
     try {
-      const response = await fetch("http://game.local:8000/game-pick", {
+      const response = await fetch(process.env.REACT_APP_SERVER_BASE_URL + "/game-pick", {
         method: "POST",
         headers: {
-          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Origin": process.env.REACT_APP_ACCESS_CONTROL_ALLOW_ORIGIN,
           "Content-type": "application/json; charset=UTF-8"
         },
         body: JSON.stringify(request)
@@ -965,10 +965,10 @@ export function NextRoundButton({ roomId, playerId, waitingForDataSubmit, setWai
     console.log(request);
 
     try {
-      const response = await fetch("http://game.local:8000/game-start", {
+      const response = await fetch(process.env.REACT_APP_SERVER_BASE_URL + "/game-start", {
         method: "POST",
         headers: {
-          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Origin": process.env.REACT_APP_ACCESS_CONTROL_ALLOW_ORIGIN,
           "Content-type": "application/json; charset=UTF-8"
         },
         body: JSON.stringify(request)
