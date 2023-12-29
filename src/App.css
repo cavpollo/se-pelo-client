@@ -561,7 +561,7 @@
   display: inline-block;
   vertical-align: bottom;
 
-  animation: ellipsis steps(4, end) 1500ms infinite;
+  animation: ellipsis steps(4, end) 3000ms infinite;
   content: "\2026"; /* ascii code for the ellipsis character */
   width: 0px; /* Normally hidden */
 }
