@@ -285,20 +285,27 @@ export function ContentWait({ setContent, roomId, roomCode, playerId }) {
         //console.log(response);
 
         if (!response.ok || response.status !== 201) {
-          console.error("Invalid status " + response.status);
+          if (response.status === 404) {
+            //TODO: Somehow show visual feedback.
+            alert('La partida ya no existe. Regresaras al menu de inicio.');
 
-          alert('¡Ha ocurrido un error! Chequea tu conexión y vuelve a intentarlo, o quejate con el administrador.');
-
-          timeoutFailuresRef.current += waitingRoomPollFrequencyInMs;
-
-          console.info(timeoutFailuresRef.current + ' >= ' + waitingRoomPollFailureInMs + ' => '(timeoutFailuresRef.current >= waitingRoomPollFailureInMs));
-          if (timeoutFailuresRef.current >= waitingRoomPollFailureInMs) {
-            alert('¡Ha ocurrido un error! Chequea tu conexión, o quejate con el administrador.');
-
-            //TODO: Somehow show visual feedback of a lack of connection.
             setContent('menu');
           } else {
-            setTimeout(pollWaitingRoom, waitingRoomPollFrequencyInMs);
+            console.error("Invalid status " + response.status);
+
+            alert('¡Ha ocurrido un error! Chequea tu conexión y vuelve a intentarlo, o quejate con el administrador.');
+
+            timeoutFailuresRef.current += waitingRoomPollFrequencyInMs;
+
+            console.info(timeoutFailuresRef.current + ' >= ' + waitingRoomPollFailureInMs + ' => '(timeoutFailuresRef.current >= waitingRoomPollFailureInMs));
+            if (timeoutFailuresRef.current >= waitingRoomPollFailureInMs) {
+              alert('¡Ha ocurrido un error! Chequea tu conexión, o quejate con el administrador.');
+
+              //TODO: Somehow show visual feedback of a lack of connection.
+              setContent('menu');
+            } else {
+              setTimeout(pollWaitingRoom, waitingRoomPollFrequencyInMs);
+            }
           }
         } else {
           const jsonResponse = await response.json();
@@ -601,20 +608,28 @@ export function ContentGame({ setContent, roomId, roomCode, playerId }) {
         //console.log(response);
 
         if (!response.ok || response.status !== 201) {
-          console.error("Invalid status " + response.status);
 
-          alert('¡Ha ocurrido un error! Chequea tu conexión y vuelve a intentarlo, o quejate con el administrador.');
+          if (response.status === 404) {
+            //TODO: Somehow show visual feedback.
+            alert('La partida ya no existe. Regresaras al menu de inicio.');
 
-          timeoutFailuresRef.current += waitingRoomPollFrequencyInMs;
-
-          console.info(timeoutFailuresRef.current + ' >= ' + waitingRoomPollFailureInMs + ' => '(timeoutFailuresRef.current >= waitingRoomPollFailureInMs));
-          if (timeoutFailuresRef.current >= waitingRoomPollFailureInMs) {
-            alert('¡Ha ocurrido un error! Chequea tu conexión, o quejate con el administrador.');
-
-            //TODO: Somehow show visual feedback of a lack of connection.
             setContent('menu');
           } else {
-            setTimeout(pollWaitingRoom, waitingRoomPollFrequencyInMs);
+            console.error("Invalid status " + response.status);
+
+            alert('¡Ha ocurrido un error! Chequea tu conexión y vuelve a intentarlo, o quejate con el administrador.');
+
+            timeoutFailuresRef.current += waitingRoomPollFrequencyInMs;
+
+            console.info(timeoutFailuresRef.current + ' >= ' + waitingRoomPollFailureInMs + ' => ' + (timeoutFailuresRef.current >= waitingRoomPollFailureInMs));
+            if (timeoutFailuresRef.current >= waitingRoomPollFailureInMs) {
+              alert('¡Ha ocurrido un error! Chequea tu conexión, o quejate con el administrador.');
+
+              //TODO: Somehow show visual feedback of a lack of connection.
+              setContent('menu');
+            } else {
+              setTimeout(pollWaitingRoom, waitingRoomPollFrequencyInMs);
+            }
           }
         } else {
           const jsonResponse = await response.json();
@@ -786,11 +801,11 @@ export function GameStatus({ status, isLeader, isOwner }) {
 
   if (active) {
     return (
-      <span class="App-game-gameroom-header-element-phase-active">{phase}</span>
+      <span className="App-game-gameroom-header-element-phase-active">{phase}</span>
     );
   } else {
     return (
-      <span class="App-game-gameroom-header-element-phase-inactive">{phase}</span>
+      <span className="App-game-gameroom-header-element-phase-inactive">{phase}</span>
     );
   }
 }
