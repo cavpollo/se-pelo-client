@@ -760,7 +760,7 @@ export function ContentGame({ setContent, roomId, roomCode, playerId }) {
       </div>
       <div className="App-game-gameroom-footer">
         <div className="App-game-gameroom-footer-message">
-          <Instruction status={roomStatus} optionsFound={options.length > 0} isLeader={playerId === leaderId} isOwner={playerId === ownerId} />
+          <Instruction status={roomStatus} optionsFound={options.length > 0} isLeader={playerId === leaderId} isOwner={playerId === ownerId} isGameEnd={roundCount === roundTotal} />
         </div>
       </div>
     </div>
@@ -810,7 +810,7 @@ export function GameStatus({ status, isLeader, isOwner }) {
   }
 }
 
-export function Instruction({ status, optionsFound, isLeader, isOwner }) {
+export function Instruction({ status, optionsFound, isLeader, isOwner, isGameEnd }) {
   let instruction = 'Espere por favor';
   let active = false;
   switch(status) {
@@ -823,7 +823,7 @@ export function Instruction({ status, optionsFound, isLeader, isOwner }) {
           instruction = 'Obteniendo inspiraciones';
         }
       } else {
-        instruction = 'Esperando a que el lider selccione una inspiracion'
+        instruction = 'Esperando a que el lider seleccione una inspiracion'
       }
       break;
     case 'LACKEY_OPTIONS':
@@ -847,7 +847,7 @@ export function Instruction({ status, optionsFound, isLeader, isOwner }) {
           instruction = 'Selecciona el remate ganador.';
         }
       } else {
-        instruction = 'Esperando a que el lider selccione un remate ganador'
+        instruction = 'Esperando a que el lider seleccione un remate ganador'
       }
       break;
     case 'NOTIFY_WINNER':
@@ -855,7 +855,11 @@ export function Instruction({ status, optionsFound, isLeader, isOwner }) {
         active = true;
         instruction = 'Inicia una nueva ronda para continuar jugando.';
       } else {
-        instruction = 'Espere a que el dueño de la partida inicie una nueva ronda';
+        if (isGameEnd) {
+          instruction = 'Espere a que el dueño de la partida inicie una nueva partida';
+        } else {
+          instruction = 'Espere a que el dueño de la partida inicie la siguiente ronda';
+        }
       }
       break;
     default:
