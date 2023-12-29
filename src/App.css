@@ -525,6 +525,98 @@
   width: 100%;
 }
 
+.App-game-gameroom-content-game-choices {
+  /* width: 100%; */
+  height: 100%;
+}
+
+.App-game-gameroom-content-game-choices-prompt {
+  display: flex;
+  justify-content: space-evenly;
+  flex-direction: column;
+
+}
+
+.App-game-gameroom-content-game-choices-finisher {
+  display: flex;
+  justify-content: space-evenly;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-content: center;
+}
+
+.App-game-gameroom-content-game-choices-choice {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: flex-start;
+
+  border-radius: 16px;
+  margin-bottom: 16px;
+}
+
+.App-game-gameroom-content-game-choices-choice-button {
+  padding: 10px;
+
+  outline: none;
+  border: 0 none;
+  border-radius: 10px;
+
+  margin-top: 0px;
+  margin-left: 0px;
+  width: 100%;
+
+  color: #ddd;
+  background-color: #416894;
+  box-shadow: inset -2px -2px 0px 0px #999;
+}
+
+.App-game-gameroom-content-game-choices-choice-button-disabled {
+  padding: 10px;
+
+  outline: none;
+  border: 0 none;
+  border-radius: 10px;
+
+  margin-top: 0px;
+  margin-left: 0px;
+  width: 100%;
+
+  color: #eee;
+  background-color: #33363a;
+  box-shadow: inset -2px -2px 0px 0px #999;
+}
+
+.App-game-gameroom-content-game-choices-choice-button-prompt {
+  font-size: 24px;
+  font-weight: 750;
+}
+
+.App-game-gameroom-content-game-choices-choice-button-finisher {
+  font-size: 18px;
+  font-weight: 750;
+
+  min-width: 240px;
+  max-width: 240px;
+  height: 100%;
+}
+
+.App-game-gameroom-content-game-choices-choice-button:hover {
+  color: #eee;
+  background-color: #345479;
+}
+
+.App-game-gameroom-content-game-choices-choice-button:active {
+  margin-top: 2px;
+  margin-left: 2px;
+  margin-right: -2px;
+  margin-bottom: -2px;
+
+  color: #fff;
+  background-color: #21354d;
+  box-shadow: inset 0px 0px 0px 0px #999;
+}
+
 .App-game-gameroom-content-game-prompt {
   width: 100%;
   margin-bottom: 16px;
@@ -553,13 +645,13 @@
 
   width: 220px;
 
-  background-color: #c5a471;
+  background-color: #a79883;
 
   border-radius: 16px;
 }
 
 .App-game-gameroom-content-game-finishers-finisher-border {
-  background: radial-gradient(#ffff00, #8d8b00);
+  background: radial-gradient(#ffffa8, #cecc51);
 }
 
 .App-game-gameroom-content-game-finishers-finisher-star {
@@ -633,11 +725,30 @@
   color: #ddd;
   background-color: #119100;
   box-shadow: inset -2px -2px 0px 0px #999;
+
+  animation-name: nextround-button;
+  animation-duration: 1s;
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+  animation-timing-function: ease-in-out;
+}
+
+@keyframes nextround-button {
+  from {
+    color: #ddd;
+    background-color: #119100;
+  }
+  to {
+    color: #eee;
+    background-color: #16bb00;
+  }
 }
 
 .App-game-gameroom-content-game-nextround-button:hover {
-  color: #eee;
-  background-color: #17c200;
+  color: #fff;
+  background-color: #1adb00;
+
+  animation-name: none;
 }
 
 .App-game-gameroom-content-game-nextround-button:active {
@@ -646,9 +757,11 @@
   margin-right: -2px;
   margin-bottom: -2px;
 
-  color: #fff;
-  background-color: #1eff00;
+  color: #bbb;
+  background-color: #063300;
   box-shadow: inset 0px 0px 0px 0px #999;
+
+  animation-name: none;
 }
 
 .App-game-gameroom-footer {
