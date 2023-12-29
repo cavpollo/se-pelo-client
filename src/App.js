@@ -297,7 +297,7 @@ export function ContentWait({ setContent, roomId, roomCode, playerId }) {
 
             timeoutFailuresRef.current += waitingRoomPollFrequencyInMs;
 
-            console.info(timeoutFailuresRef.current + ' >= ' + waitingRoomPollFailureInMs + ' => '(timeoutFailuresRef.current >= waitingRoomPollFailureInMs));
+            //console.info(timeoutFailuresRef.current + ' >= ' + waitingRoomPollFailureInMs + ' => '(timeoutFailuresRef.current >= waitingRoomPollFailureInMs));
             if (timeoutFailuresRef.current >= waitingRoomPollFailureInMs) {
               alert('¡Ha ocurrido un error! Chequea tu conexión, o quejate con el administrador.');
 
@@ -330,7 +330,7 @@ export function ContentWait({ setContent, roomId, roomCode, playerId }) {
         //TODO: I know, duplicated code:
         timeoutFailuresRef.current += waitingRoomPollFrequencyInMs;
 
-        console.info(timeoutFailuresRef.current + ' >= ' + waitingRoomPollFailureInMs + ' => ' + (timeoutFailuresRef.current >= waitingRoomPollFailureInMs));
+        //console.info(timeoutFailuresRef.current + ' >= ' + waitingRoomPollFailureInMs + ' => ' + (timeoutFailuresRef.current >= waitingRoomPollFailureInMs));
         if (timeoutFailuresRef.current >= waitingRoomPollFailureInMs) {
           alert('¡Ha ocurrido un error! Chequea tu conexión, o quejate con el administrador.');
 
@@ -511,6 +511,8 @@ export function ContentGame({ setContent, roomId, roomCode, playerId }) {
   const [roundTotal, setRoundTotal] = useState('-1');
 
   const [roomStatus, setRoomStatus] = useState('UNKNOWN');
+  const [promptText, setPromptText] = useState('');
+  const [finishers, setFinishers] = useState([]); // {'player_name': "XXX", 'finisher_text': "YYY", 'is_winner': false}
 
   const [options, setOptions] = useState([]); // {'id': 1, 'text': "XXX"}
 
@@ -582,6 +584,14 @@ export function ContentGame({ setContent, roomId, roomCode, playerId }) {
     };
   }
 
+  const toFinisher = (jsonFinisher) => {
+    return {
+      'player_name': jsonFinisher['player_name'],
+      'finisher_text': jsonFinisher['finisher_text'],
+      'is_winner': (jsonFinisher['is_winner'])
+    };
+  }
+
   useEffect(() => {
 
     async function pollWaitingRoom() {
@@ -621,7 +631,7 @@ export function ContentGame({ setContent, roomId, roomCode, playerId }) {
 
             timeoutFailuresRef.current += waitingRoomPollFrequencyInMs;
 
-            console.info(timeoutFailuresRef.current + ' >= ' + waitingRoomPollFailureInMs + ' => ' + (timeoutFailuresRef.current >= waitingRoomPollFailureInMs));
+            //console.info(timeoutFailuresRef.current + ' >= ' + waitingRoomPollFailureInMs + ' => ' + (timeoutFailuresRef.current >= waitingRoomPollFailureInMs));
             if (timeoutFailuresRef.current >= waitingRoomPollFailureInMs) {
               alert('¡Ha ocurrido un error! Chequea tu conexión, o quejate con el administrador.');
 
@@ -649,6 +659,11 @@ export function ContentGame({ setContent, roomId, roomCode, playerId }) {
 
           setRoundCount(jsonResponse['round_counter']);
           setRoundTotal(jsonResponse['round_total']);
+
+          setPromptText(jsonResponse['prompt_text'] || '');
+
+          const parsed_finishers = (jsonResponse['finishers'] || []).map(toFinisher);
+          setFinishers(parsed_finishers);
 
           const responseRoomStatus = jsonResponse['room_status'];
           if (roomStatusRef.current !== responseRoomStatus) {
@@ -690,7 +705,7 @@ export function ContentGame({ setContent, roomId, roomCode, playerId }) {
         //TODO: I know, duplicated code:
         timeoutFailuresRef.current += waitingRoomPollFrequencyInMs;
 
-        console.info(timeoutFailuresRef.current + ' >= ' + waitingRoomPollFailureInMs + ' => ' + (timeoutFailuresRef.current >= waitingRoomPollFailureInMs));
+        //console.info(timeoutFailuresRef.current + ' >= ' + waitingRoomPollFailureInMs + ' => ' + (timeoutFailuresRef.current >= waitingRoomPollFailureInMs));
         if (timeoutFailuresRef.current >= waitingRoomPollFailureInMs) {
           alert('¡Ha ocurrido un error! Chequea tu conexión, o quejate con el administrador.');
 
@@ -754,6 +769,8 @@ export function ContentGame({ setContent, roomId, roomCode, playerId }) {
           </div>
         </div>
         <div className="App-game-gameroom-content-game">
+          <Prompt promptText={promptText} />
+          <Finishers finishers={finishers} />
           <Options roomId={roomId} playerId={playerId} waitingForDataSubmit={waitingForDataSubmit} setWaitingForDataSubmit={setWaitingForDataSubmit} options={options} status={roomStatus} isLeader={playerId === leaderId} />
           <NextRoundButton roomId={roomId} playerId={playerId} waitingForDataSubmit={waitingForDataSubmit} setWaitingForDataSubmit={setWaitingForDataSubmit} status={roomStatus} isOwner={playerId === ownerId} isGameEnd={roundCount === roundTotal} />
         </div>
@@ -810,72 +827,45 @@ export function GameStatus({ status, isLeader, isOwner }) {
   }
 }
 
-export function Instruction({ status, optionsFound, isLeader, isOwner, isGameEnd }) {
-  let instruction = 'Espere por favor';
-  let active = false;
-  switch(status) {
-    case 'LEADER_OPTIONS':
-      if (isLeader) {
-        if (optionsFound) {
-          active = true;
-          instruction = 'Selecciona una inspiracion para los secuaces.';
-        } else {
-          instruction = 'Obteniendo inspiraciones';
-        }
-      } else {
-        instruction = 'Esperando a que el lider seleccione una inspiracion'
-      }
-      break;
-    case 'LACKEY_OPTIONS':
-      if (isLeader) {
-        instruction = 'Esperando a que los secuaces seleccionen una remate';
-      } else {
-        if (optionsFound) {
-          active = true;
-          instruction = 'Selecciona un remate para que lo vea el lider.';
-        } else {
-          instruction = 'Obteniendo remates';
-        }
-      }
-      break;
-    case 'LEADER_PICK':
-      if (isLeader) {
-        if (optionsFound) {
-          instruction = 'Obteniendo remates';
-        } else {
-          active = true;
-          instruction = 'Selecciona el remate ganador.';
-        }
-      } else {
-        instruction = 'Esperando a que el lider seleccione un remate ganador'
-      }
-      break;
-    case 'NOTIFY_WINNER':
-      if (isOwner) {
-        active = true;
-        instruction = 'Inicia una nueva ronda para continuar jugando.';
-      } else {
-        if (isGameEnd) {
-          instruction = 'Espere a que el dueño de la partida inicie una nueva partida';
-        } else {
-          instruction = 'Espere a que el dueño de la partida inicie la siguiente ronda';
-        }
-      }
-      break;
-    default:
-      break;
-  }
-
-  if (active) {
+export function Prompt({ promptText }) {
+  if (promptText && promptText.trim() !== '') {
     return (
-      <span class="App-game-gameroom-footer-message-active">{instruction}</span>
+      <div className="App-game-gameroom-content-game-prompt">
+        {promptText}
+      </div>
     );
   } else {
-    return (
-      <span class="App-game-gameroom-footer-message-inactive">{instruction}</span>
-    );
+    return;
   }
 }
+
+export function Finishers({ finishers }) {
+  if (finishers && finishers.length > 0) {
+    return (
+      <div className="App-game-gameroom-content-game-finishers">
+        {
+          finishers.map((finisher) => {
+            const finisherClasses = 'App-game-gameroom-content-game-finishers-finisher' + (finisher.is_winner ? ' App-game-gameroom-content-game-finishers-finisher-border' : '');
+            return <div className={finisherClasses}>
+                { finisher.is_winner ? <div className="App-game-gameroom-content-game-finishers-finisher-star" title="Ganador">⭐</div> : '' }
+                <div className="App-game-gameroom-content-game-finishers-finisher-inner">
+                  <div className="App-game-gameroom-content-game-finishers-finisher-inner-text">
+                    {finisher.finisher_text}
+                  </div>
+                  <div className="App-game-gameroom-content-game-finishers-finisher-inner-player">
+                    - {finisher.player_name}
+                  </div>
+                </div>
+            </div>
+          })
+        }
+      </div>
+    );
+  } else {
+    return;
+  }
+}
+
 
 export function Options({ roomId, playerId, waitingForDataSubmit, setWaitingForDataSubmit, options, status, isLeader }) {
   const pickOption = useCallback(async (optionId) => {
@@ -998,16 +988,86 @@ export function NextRoundButton({ roomId, playerId, waitingForDataSubmit, setWai
     }
   }, [setWaitingForDataSubmit]);
 
+
+
   if (isOwner && status === 'NOTIFY_WINNER') {
     return (
-      <button className="App-game-gameroom-content-game-nextround" type="button" disabled={waitingForDataSubmit} onClick={_ => nextRound()}>
-        { isGameEnd ? 'Iniciar nueva partida' : 'Iniciar siguiente ronda' }
-      </button>
+      <div className="App-game-gameroom-content-game-nextround">
+        <button className="App-game-gameroom-content-game-nextround-button" type="button" disabled={waitingForDataSubmit} onClick={_ => nextRound()}>
+          { isGameEnd ? 'Iniciar nueva partida' : 'Iniciar siguiente ronda' }
+        </button>
+      </div>
     );
   } else {
     return;
   }
 }
 
+export function Instruction({ status, optionsFound, isLeader, isOwner, isGameEnd }) {
+  let instruction = 'Espere por favor';
+  let active = false;
+  switch(status) {
+    case 'LEADER_OPTIONS':
+      if (isLeader) {
+        if (optionsFound) {
+          active = true;
+          instruction = 'Selecciona una inspiracion para los secuaces.';
+        } else {
+          instruction = 'Obteniendo inspiraciones';
+        }
+      } else {
+        instruction = 'Esperando a que el lider seleccione una inspiracion'
+      }
+      break;
+    case 'LACKEY_OPTIONS':
+      if (isLeader) {
+        instruction = 'Esperando a que los secuaces seleccionen una remate';
+      } else {
+        if (optionsFound) {
+          active = true;
+          instruction = 'Selecciona un remate para que lo vea el lider.';
+        } else {
+          instruction = 'Obteniendo remates';
+        }
+      }
+      break;
+    case 'LEADER_PICK':
+      if (isLeader) {
+        if (optionsFound) {
+          instruction = 'Obteniendo remates';
+        } else {
+          active = true;
+          instruction = 'Selecciona el remate ganador.';
+        }
+      } else {
+        instruction = 'Esperando a que el lider seleccione un remate ganador'
+      }
+      break;
+    case 'NOTIFY_WINNER':
+      if (isOwner) {
+        active = true;
+        instruction = 'Inicia una nueva ronda para continuar jugando.';
+      } else {
+        if (isGameEnd) {
+          instruction = 'Espere a que el dueño de la partida inicie una nueva partida';
+        } else {
+          instruction = 'Espere a que el dueño de la partida inicie la siguiente ronda';
+        }
+      }
+      break;
+    default:
+      break;
+  }
+
+  if (active) {
+    return (
+      <span className="App-game-gameroom-footer-message-active">{instruction}</span>
+    );
+  } else {
+    return (
+      <span className="App-game-gameroom-footer-message-inactive">{instruction}</span>
+    );
+  }
+}
 
 export default App;
