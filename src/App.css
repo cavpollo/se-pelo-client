@@ -433,6 +433,35 @@
   width: 100%;
 }
 
+.App-game-gameroom-header-element-phase {
+  /* ? */
+}
+
+.App-game-gameroom-header-element-phase-active {
+  font-weight: 750;
+  color: #00ff2a;
+  font-size: 16px;
+
+  animation-name: active-phase;
+  animation-duration: 1s;
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+  animation-timing-function: ease-in-out;
+}
+
+@keyframes active-phase {
+  from {
+    color: #00ff2a;
+  }
+  to {
+    color: #ffff00;
+  }
+}
+
+.App-game-gameroom-header-element-phase-inactive {
+
+}
+
 .App-game-gameroom-content-playerslist {
   position: absolute;
 }
@@ -502,4 +531,31 @@
 
 .App-game-gameroom-footer-message {
   padding: 4px;
+}
+
+.App-game-gameroom-footer-message-active {
+  font-weight: 750;
+  color: #00ff2a;
+  font-size: 16px;
+
+  animation-name: active-message;
+  animation-duration: 1s;
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+  animation-timing-function: ease-in-out;
+}
+
+@keyframes active-message {
+  from {
+    font-size: 16px;
+    color: #00ff2a;
+  }
+  to {
+    font-size: 15px;
+    color: #ffff00;
+  }
+}
+
+.App-game-gameroom-footer-message-inactive {
+
 }

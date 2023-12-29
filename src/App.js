@@ -501,8 +501,7 @@ export function ContentGame({ setContent, roomId, roomCode, playerId }) {
   const [roundCount, setRoundCount] = useState('-1');
   const [roundTotal, setRoundTotal] = useState('-1');
 
-  const [titleStatus, setTitleStatus] = useState('Cargando...');
-  const [instruction, setInstructions] = useState('Espere por favor...');
+  const [roomStatus, setRoomStatus] = useState('UNKNOWN');
 
   const [options, setOptions] = useState([]); // {'id': 1, 'text': "XXX"}
 
@@ -636,55 +635,26 @@ export function ContentGame({ setContent, roomId, roomCode, playerId }) {
           if (roomStatusRef.current !== responseRoomStatus) {
             console.log(responseRoomStatus);
 
+            roomStatusRef.current = responseRoomStatus;
+            setRoomStatus(responseRoomStatus);
+
             switch(responseRoomStatus) {
               case 'LEADER_OPTIONS':
-                roomStatusRef.current = responseRoomStatus;
-                setTitleStatus('Inspiracion');
                 if (playerId === responseLeaderId) {
-                  setInstructions('Obteniendo inspiracion para el lider...');
-
                   fetchOptions();
-                } else {
-                  setInstructions('Esperando a que el lider selccione una inspiracion...');
-                  //TODO: Just wait: Show loading thingy
                 }
                 break;
               case 'LACKEY_OPTIONS':
-                roomStatusRef.current = responseRoomStatus;
-                setTitleStatus('Remate');
-                if (playerId === responseLeaderId) {
-                  setInstructions('Esperando a que los secuaces seleccionen una remate...');
-                  //TODO: Just wait: Show loading thingy
-                } else {
-                  //TODO: Request leader chosen option
-                  //TODO: Request lackey options
+                if (playerId !== responseLeaderId) {
                   fetchOptions();
-                  setInstructions('Obteniendo opciones de secuas...');
                 }
                 break;
               case 'LEADER_PICK':
-                roomStatusRef.current = responseRoomStatus;
-                setTitleStatus('Votacion');
                 if (playerId === responseLeaderId) {
-                  //TODO: Request lackey options
-                  //TODO: Allow leader to pick a lackey option
-                  setInstructions('Obteniendo remates de secuaces...');
-                } else {
-                  setInstructions('Esperando a que el lider selccione un remate ganador...');
-                  //TODO: Just wait: Show loading thingy
+                  fetchOptions();
                 }
                 break;
               case 'NOTIFY_WINNER':
-                roomStatusRef.current = responseRoomStatus;
-                setTitleStatus('Ganador');
-
-                //TODO: Show winner
-
-                if (playerId === responseOwnerId) {
-                  setInstructions('Inicia una nueva ronda...');
-                } else {
-                  setInstructions('Espere a que el dueno inicie una nueva ronda...');
-                }
                 break;
               default:
                 console.error('Unknown status: ' + responseRoomStatus);
@@ -720,7 +690,7 @@ export function ContentGame({ setContent, roomId, roomCode, playerId }) {
       pollWaitingRoom();
     }
 
-  }, [roomId, playerId, roomStatusRef, setOwnerId, setLeaderId, setPlayers, setTitleStatus, setInstructions]);
+  }, [roomId, playerId, roomStatusRef, setRoomStatus, setOwnerId, setLeaderId, setPlayers]);
 
   // renderRef.current++;
   // console.log('render ' + renderRef.current);
@@ -731,8 +701,9 @@ export function ContentGame({ setContent, roomId, roomCode, playerId }) {
         <div className="App-game-gameroom-header-element App-game-gameroom-header-element-roomcode">
           Codigo de sala:&nbsp;<span className="App-game-gameroom-header-code">{roomCode}</span>
         </div>
-        <div className="App-game-gameroom-header-element">
-          Status: { titleStatus }
+        <div className="App-game-gameroom-header-element App-game-gameroom-header-element-phase">
+          <span>Fase:&nbsp;</span>
+          <GameStatus status={roomStatus} isLeader={playerId === leaderId} isOwner={playerId === ownerId} />
         </div>
         <div className="App-game-gameroom-header-element App-game-gameroom-header-element-time">
           Tiempo: ∞
@@ -771,11 +742,117 @@ export function ContentGame({ setContent, roomId, roomCode, playerId }) {
       </div>
       <div className="App-game-gameroom-footer">
         <div className="App-game-gameroom-footer-message">
-          {instruction}
+          <Instruction status={roomStatus} optionsFound={options.length > 0} isLeader={playerId === leaderId} isOwner={playerId === ownerId} />
         </div>
       </div>
     </div>
   );
+}
+
+export function GameStatus({ status, isLeader, isOwner }) {
+  let phase = 'Cargando';
+  let active = false;
+  switch(status) {
+    case 'LEADER_OPTIONS':
+      phase = 'Inspiracion';
+      if (isLeader) {
+        active = true;
+      }
+      break;
+    case 'LACKEY_OPTIONS':
+      phase = 'Remate';
+      if (!isLeader) {
+        active = true;
+      }
+      break;
+    case 'LEADER_PICK':
+      phase = 'Votacion';
+      if (isLeader) {
+        active = true;
+      }
+      break;
+    case 'NOTIFY_WINNER':
+      phase = 'Ganador';
+      if (isOwner) {
+        active = true;
+      }
+      break;
+    default:
+      break;
+  }
+
+  if (active) {
+    return (
+      <span class="App-game-gameroom-header-element-phase-active">{phase}</span>
+    );
+  } else {
+    return (
+      <span class="App-game-gameroom-header-element-phase-inactive">{phase}</span>
+    );
+  }
+}
+
+export function Instruction({ status, optionsFound, isLeader, isOwner }) {
+  let instruction = 'Espere por favor...';
+  let active = false;
+  switch(status) {
+    case 'LEADER_OPTIONS':
+      if (isLeader) {
+        active = true;
+        if (optionsFound) {
+          instruction = 'Selecciona una inspiracion para los secuaces.';
+        } else {
+          instruction = 'Obteniendo inspiraciones...';
+        }
+      } else {
+        instruction = 'Esperando a que el lider selccione una inspiracion...'
+      }
+      break;
+    case 'LACKEY_OPTIONS':
+      if (isLeader) {
+        instruction = 'Esperando a que los secuaces seleccionen una remate...';
+      } else {
+        active = true;
+        if (optionsFound) {
+          instruction = 'Selecciona un remate para el lider.';
+        } else {
+          instruction = 'Obteniendo remates...';
+        }
+      }
+      break;
+    case 'LEADER_PICK':
+      if (isLeader) {
+        active = true;
+        if (optionsFound) {
+          instruction = 'Obteniendo remates...';
+        } else {
+          instruction = 'Selecciona el remate ganador.';
+        }
+      } else {
+        instruction = 'Esperando a que el lider selccione un remate ganador...'
+      }
+      break;
+    case 'NOTIFY_WINNER':
+      if (isOwner) {
+        active = true;
+        instruction = 'Inicia una nueva ronda para continuar jugando.';
+      } else {
+        instruction = 'Espere a que el dueño de la partida inicie una nueva ronda...';
+      }
+      break;
+    default:
+      break;
+  }
+
+  if (active) {
+    return (
+      <span class="App-game-gameroom-footer-message-active">{instruction}</span>
+    );
+  } else {
+    return (
+      <span class="App-game-gameroom-footer-message-inactive">{instruction}</span>
+    );
+  }
 }
 
 export function Options({ roomId, playerId, options, setOptions }) {
@@ -821,6 +898,7 @@ export function Options({ roomId, playerId, options, setOptions }) {
       setPickOptionButtonEnabled(true);
     }
   }, [setPickOptionButtonEnabled]);
+
   if (options.length > 0) {
     return (
       <div>
