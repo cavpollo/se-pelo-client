@@ -459,7 +459,7 @@
 }
 
 .App-game-gameroom-header-element-phase-inactive {
-
+  font-weight: 750;
 }
 
 .App-game-gameroom-content-playerslist {
@@ -556,6 +556,18 @@
   }
 }
 
-.App-game-gameroom-footer-message-inactive {
+.App-game-gameroom-footer-message-inactive:after {
+  overflow: hidden;
+  display: inline-block;
+  vertical-align: bottom;
 
+  animation: ellipsis steps(4, end) 1500ms infinite;
+  content: "\2026"; /* ascii code for the ellipsis character */
+  width: 0px; /* Normally hidden */
+}
+
+@keyframes ellipsis {
+  to {
+    width: 16px; /* Highly dependant on the font-size... */
+  }
 }
