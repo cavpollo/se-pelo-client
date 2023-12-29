@@ -498,6 +498,8 @@ export function ContentGame({ setContent, roomId, roomCode, playerId }) {
   const [ownerId, setOwnerId] = useState(-1);
   const [leaderId, setLeaderId] = useState(-1);
 
+  const [waitingForDataSubmit, setWaitingForDataSubmit] = useState(false);
+
   const [roundCount, setRoundCount] = useState('-1');
   const [roundTotal, setRoundTotal] = useState('-1');
 
@@ -553,13 +555,15 @@ export function ContentGame({ setContent, roomId, roomCode, playerId }) {
 
         const parsed_options = jsonResponse['options'].map(toOption);
         setOptions(parsed_options);
+
+        setWaitingForDataSubmit(false);
       }
     } catch (error) {
       console.error(error);
 
       alert('¡Ha ocurrido un error! Chequea tu conexión y vuelve a intentarlo, o quejate con el administrador.');
     }
-  }, [setOptions]);
+  }, [setOptions, setWaitingForDataSubmit]);
 
 
   const toPlayer = (jsonPlayer) => {
@@ -655,6 +659,7 @@ export function ContentGame({ setContent, roomId, roomCode, playerId }) {
                 }
                 break;
               case 'NOTIFY_WINNER':
+                setWaitingForDataSubmit(false);
                 break;
               default:
                 console.error('Unknown status: ' + responseRoomStatus);
@@ -690,7 +695,7 @@ export function ContentGame({ setContent, roomId, roomCode, playerId }) {
       pollWaitingRoom();
     }
 
-  }, [roomId, playerId, roomStatusRef, setRoomStatus, setOwnerId, setLeaderId, setPlayers]);
+  }, [roomId, playerId, roomStatusRef, setRoomStatus, setOwnerId, setLeaderId, setPlayers, setWaitingForDataSubmit]);
 
   // renderRef.current++;
   // console.log('render ' + renderRef.current);
@@ -734,10 +739,8 @@ export function ContentGame({ setContent, roomId, roomCode, playerId }) {
           </div>
         </div>
         <div className="App-game-gameroom-content-game">
-          <div>
-            XXX
-          </div>
-          <Options roomId={roomId} playerId={playerId} options={options} setOptions={setOptions} />
+          <Options roomId={roomId} playerId={playerId} waitingForDataSubmit={waitingForDataSubmit} setWaitingForDataSubmit={setWaitingForDataSubmit} options={options} status={roomStatus} isLeader={playerId === leaderId} />
+          <NextRoundButton roomId={roomId} playerId={playerId} waitingForDataSubmit={waitingForDataSubmit} setWaitingForDataSubmit={setWaitingForDataSubmit} status={roomStatus} isOwner={playerId === ownerId} isGameEnd={roundCount === roundTotal} />
         </div>
       </div>
       <div className="App-game-gameroom-footer">
@@ -814,7 +817,7 @@ export function Instruction({ status, optionsFound, isLeader, isOwner }) {
       } else {
         if (optionsFound) {
           active = true;
-          instruction = 'Selecciona un remate para el lider.';
+          instruction = 'Selecciona un remate para que lo vea el lider.';
         } else {
           instruction = 'Obteniendo remates';
         }
@@ -855,11 +858,9 @@ export function Instruction({ status, optionsFound, isLeader, isOwner }) {
   }
 }
 
-export function Options({ roomId, playerId, options, setOptions }) {
-  const [pickOptionButtonEnabled, setPickOptionButtonEnabled] = useState(true);
-
+export function Options({ roomId, playerId, waitingForDataSubmit, setWaitingForDataSubmit, options, status, isLeader }) {
   const pickOption = useCallback(async (optionId) => {
-    setPickOptionButtonEnabled(false);
+    setWaitingForDataSubmit(true);
 
     const request = {
       room_id: roomId,
@@ -886,32 +887,103 @@ export function Options({ roomId, playerId, options, setOptions }) {
 
         alert('¡Ha ocurrido un error! Chequea tu conexión y vuelve a intentarlo, o quejate con el administrador.');
 
-        setPickOptionButtonEnabled(true);
-      } else {
-        setOptions([]);
+        setWaitingForDataSubmit(false);
       }
     } catch (error) {
       console.error(error);
 
       alert('¡Ha ocurrido un error! Chequea tu conexión y vuelve a intentarlo, o quejate con el administrador.');
 
-      setPickOptionButtonEnabled(true);
+      setWaitingForDataSubmit(false);
     }
-  }, [setPickOptionButtonEnabled]);
+  }, [setWaitingForDataSubmit]);
 
-  if (options.length > 0) {
+  let showOptions = false;
+  switch(status) {
+    case 'LEADER_OPTIONS':
+      if (isLeader) {
+        showOptions = true;
+      }
+      break;
+    case 'LACKEY_OPTIONS':
+      if (!isLeader) {
+        showOptions = true;
+      }
+      break;
+    case 'LEADER_PICK':
+      if (isLeader) {
+        showOptions = true;
+      }
+      break;
+    case 'NOTIFY_WINNER':
+      break;
+    default:
+      break;
+  }
+
+  if (options.length > 0 && showOptions) {
     return (
       <div>
         {
           options.map((option) => {
             return <div key={option.id}>
-              <button className="App-game-gameroom-content-game-choice" type="button" disabled={!pickOptionButtonEnabled} onClick={_ => pickOption(option.id)}>
+              <button className="App-game-gameroom-content-game-choice" type="button" disabled={waitingForDataSubmit} onClick={_ => pickOption(option.id)}>
                 {option.id} - {option.text}
               </button>
             </div>
           })
         }
       </div>
+    );
+  } else {
+    return;
+  }
+}
+
+export function NextRoundButton({ roomId, playerId, waitingForDataSubmit, setWaitingForDataSubmit, status, isOwner, isGameEnd }) {
+  const nextRound = useCallback(async () => {
+    setWaitingForDataSubmit(true);
+
+    const request = {
+      room_id: roomId,
+      player_id: playerId
+    };
+
+    console.log(request);
+
+    try {
+      const response = await fetch("http://game.local:8000/game-start", {
+        method: "POST",
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+          "Content-type": "application/json; charset=UTF-8"
+        },
+        body: JSON.stringify(request)
+      });
+
+      console.log(response);
+
+      if (!response.ok || response.status !== 204) {
+        console.error("Invalid status " + response.status);
+
+        alert('¡Ha ocurrido un error! Chequea tu conexión y vuelve a intentarlo, o quejate con el administrador.');
+
+        setWaitingForDataSubmit(false);
+      }
+    } catch (error) {
+      console.error(error);
+
+      alert('¡Ha ocurrido un error! Chequea tu conexión y vuelve a intentarlo, o quejate con el administrador.');
+
+      setWaitingForDataSubmit(false);
+    }
+  }, [setWaitingForDataSubmit]);
+
+  if (isOwner && status === 'NOTIFY_WINNER') {
+    return (
+      <button className="App-game-gameroom-content-game-nextround" type="button" disabled={waitingForDataSubmit} onClick={_ => nextRound()}>
+        { isGameEnd ? 'Iniciar nueva partida' : 'Iniciar siguiente ronda' }
+      </button>
     );
   } else {
     return;
