@@ -79,7 +79,8 @@ export function ContentCreate({ setContent, setRoomId, setRoomCode, setPlayerId 
         method: "POST",
         headers: {
           "Access-Control-Allow-Origin": process.env.REACT_APP_ACCESS_CONTROL_ALLOW_ORIGIN,
-          "Content-type": "application/json; charset=UTF-8"
+          "Content-type": "application/json; charset=UTF-8",
+          "Accept": "application/json"
         },
         body: JSON.stringify(request)
       });
@@ -168,7 +169,8 @@ export function ContentJoin({ setContent, setRoomId, roomCode, setRoomCode, setP
         method: "POST",
         headers: {
           "Access-Control-Allow-Origin": process.env.REACT_APP_ACCESS_CONTROL_ALLOW_ORIGIN,
-          "Content-type": "application/json; charset=UTF-8"
+          "Content-type": "application/json; charset=UTF-8",
+          "Accept": "application/json"
         },
         body: JSON.stringify(request)
       });
@@ -277,7 +279,8 @@ export function ContentWait({ setContent, roomId, roomCode, playerId }) {
           method: "POST",
           headers: {
             "Access-Control-Allow-Origin": process.env.REACT_APP_ACCESS_CONTROL_ALLOW_ORIGIN,
-            "Content-type": "application/json; charset=UTF-8"
+            "Content-type": "application/json; charset=UTF-8",
+            "Accept": "application/json"
           },
           body: JSON.stringify(request)
         });
@@ -371,7 +374,7 @@ export function ContentWait({ setContent, roomId, roomCode, playerId }) {
           {
             players.map((player) => {
               return <span key={player.id}>
-                <PartyOwner isOwner={player.id === ownerId} />&nbsp;
+                <PartyOwner isOwner={player.id === ownerId} />
                 <PlayerName player_name={player.name} last_check={player.last_check} />&nbsp;
                 <PlayerStatus last_check={player.last_check} />
               </span>
@@ -388,7 +391,7 @@ export function ContentWait({ setContent, roomId, roomCode, playerId }) {
 export function PartyOwner({ isOwner }) {
   if (isOwner) {
     return (
-      <span title="Dueño de la partida">🎩</span>
+      <span title="Dueño de la partida">🎩&nbsp;</span>
     );
   } else {
     return;
@@ -546,7 +549,8 @@ export function ContentGame({ setContent, roomId, roomCode, playerId }) {
         method: "POST",
         headers: {
           "Access-Control-Allow-Origin": process.env.REACT_APP_ACCESS_CONTROL_ALLOW_ORIGIN,
-          "Content-type": "application/json; charset=UTF-8"
+          "Content-type": "application/json; charset=UTF-8",
+          "Accept": "application/json"
         },
         body: JSON.stringify(request)
       });
@@ -580,6 +584,7 @@ export function ContentGame({ setContent, roomId, roomCode, playerId }) {
       'id': jsonPlayer['player_id'],
       'name': jsonPlayer['player_name'],
       'score': jsonPlayer['score'],
+      'is_finisher_ready': jsonPlayer['is_finisher_ready'],
       'last_check': jsonPlayer['last_check']
     };
   }
@@ -611,7 +616,8 @@ export function ContentGame({ setContent, roomId, roomCode, playerId }) {
           method: "POST",
           headers: {
             "Access-Control-Allow-Origin": process.env.REACT_APP_ACCESS_CONTROL_ALLOW_ORIGIN,
-            "Content-type": "application/json; charset=UTF-8"
+            "Content-type": "application/json; charset=UTF-8",
+            "Accept": "application/json"
           },
           body: JSON.stringify(request)
         });
@@ -758,7 +764,9 @@ export function ContentGame({ setContent, roomId, roomCode, playerId }) {
                 {
                   players.map((player) => {
                     return <span key={player.id}>
-                      <PartyOwner isOwner={player.id === ownerId} />&nbsp;
+                      <PartyOwner isOwner={player.id === ownerId} />
+                      <PartyLeader isLeader={player.id === leaderId} />
+                      <PlayerOptionStatus isLeader={player.id === leaderId} isFinisherReady={player.is_finisher_ready} status={roomStatus} />
                       <PlayerStatus last_check={player.last_check} />&nbsp;
                       <PlayerName player_name={player.name} last_check={player.last_check} />
                       : {player.score}
@@ -783,6 +791,48 @@ export function ContentGame({ setContent, roomId, roomCode, playerId }) {
       </div>
     </div>
   );
+}
+
+export function PartyLeader({ isLeader }) {
+  if (isLeader) {
+    return (
+      <span title="Lider de la ronda">💎&nbsp;</span>
+    );
+  } else {
+    return;
+  }
+}
+
+export function PlayerOptionStatus({ isLeader, isFinisherReady, status }) {
+  if (isLeader) {
+    switch(status) {
+      case 'LEADER_OPTIONS':
+        return (
+          <span title="Seleccionando la inspiracion">⏳&nbsp;</span>
+        );
+      case 'LEADER_PICK':
+        return (
+          <span title="Seleccionando el remate ganador">⚖️&nbsp;</span>
+        );
+      default:
+        return;
+    }
+  } else {
+    switch(status) {
+      case 'LACKEY_OPTIONS':
+        if (isFinisherReady) {
+          return (
+            <span title="Remate listo">✔️&nbsp;</span>
+          );
+        } else {
+          return (
+            <span title="Seleccionando un remate">⏳&nbsp;</span>
+          );
+        }
+      default:
+        return;
+    }
+  }
 }
 
 export function GameStatus({ status, isLeader, isOwner, waitingForDataSubmit }) {
