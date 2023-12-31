@@ -627,6 +627,29 @@
   background-color: #fff;
 }
 
+.App-game-gameroom-content-game-prompt-winnerplayer {
+  color: #c7ca00;
+
+  animation-name: prompt-winnerplayer;
+  animation-duration: 1s;
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+  animation-timing-function: ease-in-out;
+}
+
+@keyframes prompt-winnerplayer {
+  from {
+    color: #c7ca00;
+  }
+  to {
+    color: #f1f500;
+  }
+}
+
+.App-game-gameroom-content-game-prompt-winnerfinisher {
+  color: #ff0000;
+}
+
 .App-game-gameroom-content-game-finishers {
   display: flex;
   justify-content: space-around;
@@ -652,10 +675,6 @@
 
 .App-game-gameroom-content-game-finishers-finisher-border {
   background: radial-gradient(#ffffa8, #cecc51);
-}
-
-.App-game-gameroom-content-game-finishers-finisher-star {
-  position: absolute;
 }
 
 .App-game-gameroom-content-game-finishers-finisher-inner {
