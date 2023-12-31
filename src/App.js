@@ -778,7 +778,7 @@ export function ContentGame({ setContent, roomId, roomCode, playerId }) {
           </div>
         </div>
         <div className="App-game-gameroom-content-game">
-          <Prompt promptText={promptText} />
+          <Prompt promptText={promptText} finishers={finishers} />
           <Finishers finishers={finishers} />
           <Options roomId={roomId} playerId={playerId} waitingForDataSubmit={waitingForDataSubmit} setWaitingForDataSubmit={setWaitingForDataSubmit} options={options} status={roomStatus} isLeader={playerId === leaderId} />
           <NextRoundButton roomId={roomId} playerId={playerId} waitingForDataSubmit={waitingForDataSubmit} setWaitingForDataSubmit={setWaitingForDataSubmit} status={roomStatus} isOwner={playerId === ownerId} isGameEnd={roundCount === roundTotal} />
@@ -878,13 +878,34 @@ export function GameStatus({ status, isLeader, isOwner, waitingForDataSubmit }) 
   }
 }
 
-export function Prompt({ promptText }) {
+export function Prompt({ promptText, finishers }) {
   if (promptText && promptText.trim() !== '') {
-    return (
-      <div className="App-game-gameroom-content-game-prompt">
-        {promptText}
-      </div>
-    );
+    if (finishers && finishers.length > 0) {
+      const winnerFinisher = finishers.find((finisher) => finisher.is_winner);
+
+      const promptTextPieces = promptText.split('_');
+
+      const lowercaseWinnerFinisher = winnerFinisher.finisher_text[0].toLowerCase() + winnerFinisher.finisher_text.slice(1);
+
+      return (
+        <div className="App-game-gameroom-content-game-prompt">
+          <div>
+            ¡<span className="App-game-gameroom-content-game-prompt-winnerplayer">{winnerFinisher.player_name}</span> se peló!
+          </div>
+          <div>
+            {promptTextPieces[0]}
+            <span className="App-game-gameroom-content-game-prompt-winnerfinisher">{lowercaseWinnerFinisher}</span>
+            {promptTextPieces[1]}
+          </div>
+        </div>
+      );
+    } else {
+      return (
+        <div className="App-game-gameroom-content-game-prompt">
+          {promptText}
+        </div>
+      );
+    }
   } else {
     return;
   }
@@ -896,9 +917,12 @@ export function Finishers({ finishers }) {
       <div className="App-game-gameroom-content-game-finishers">
         {
           finishers.map((finisher) => {
+            if (finisher.is_winner) {
+              return;
+            }
+
             const finisherClasses = 'App-game-gameroom-content-game-finishers-finisher' + (finisher.is_winner ? ' App-game-gameroom-content-game-finishers-finisher-border' : '');
             return <div key={finisher.index} className={finisherClasses}>
-                { finisher.is_winner ? <div className="App-game-gameroom-content-game-finishers-finisher-star" title="Ganador">⭐</div> : '' }
                 <div className="App-game-gameroom-content-game-finishers-finisher-inner">
                   <div className="App-game-gameroom-content-game-finishers-finisher-inner-text">
                     {finisher.finisher_text}
