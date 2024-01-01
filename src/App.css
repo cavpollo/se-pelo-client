@@ -624,11 +624,13 @@
   font-weight: 750;
   font-size: 32px;
   color: #000;
+  text-shadow: 2px 2px 1px #ccc;
   background-color: #fff;
 }
 
 .App-game-gameroom-content-game-prompt-winnerplayer {
   color: #c7ca00;
+  text-shadow: 2px 2px 1px #000;
 
   animation-name: prompt-winnerplayer;
   animation-duration: 1s;
@@ -648,6 +650,7 @@
 
 .App-game-gameroom-content-game-prompt-winnerfinisher {
   color: #ff0000;
+  text-shadow: 2px 2px 1px #000;
 }
 
 .App-game-gameroom-content-game-finishers {
