@@ -885,7 +885,7 @@ export function Prompt({ promptText, finishers }) {
 
       const promptTextPieces = promptText.split('_');
 
-      const lowercaseWinnerFinisher = winnerFinisher.finisher_text[0].toLowerCase() + winnerFinisher.finisher_text.slice(1);
+      const uppercasedWinnerFinisher = getUppercasedFinisherText(promptTextPieces[0], winnerFinisher.finisher_text);
 
       return (
         <div className="App-game-gameroom-content-game-prompt">
@@ -894,7 +894,7 @@ export function Prompt({ promptText, finishers }) {
           </div>
           <div>
             {promptTextPieces[0]}
-            <span className="App-game-gameroom-content-game-prompt-winnerfinisher">{lowercaseWinnerFinisher}</span>
+            <span className="App-game-gameroom-content-game-prompt-winnerfinisher">{uppercasedWinnerFinisher}</span>
             {promptTextPieces[1]}
           </div>
         </div>
@@ -908,6 +908,16 @@ export function Prompt({ promptText, finishers }) {
     }
   } else {
     return;
+  }
+}
+
+function getUppercasedFinisherText(promptLeftPiece, finisherText) {
+  // 'abc! _' or 'abc? _' or 'x. _' or '¡_' or '¿_'
+  const firstCleanPromptTextPiece = promptLeftPiece.trim();
+  if (firstCleanPromptTextPiece.length === 0 || ['!', '¡', '?', '¿', '.'].includes(firstCleanPromptTextPiece[firstCleanPromptTextPiece.length-1])) {
+    return finisherText[0].toUpperCase() + finisherText.slice(1);
+  } else {
+    return finisherText;
   }
 }
 
@@ -1070,7 +1080,7 @@ export function NextRoundButton({ roomId, playerId, waitingForDataSubmit, setWai
     return (
       <div className="App-game-gameroom-content-game-nextround">
         <button className="App-game-gameroom-content-game-nextround-button" type="button" disabled={waitingForDataSubmit} onClick={_ => nextRound()}>
-          { isGameEnd ? 'Iniciar nueva partida' : 'Iniciar siguiente ronda' }
+          { isGameEnd ? 'Iniciar una nueva partida' : 'Iniciar la siguiente ronda' }
         </button>
       </div>
     );
