@@ -1080,7 +1080,7 @@ export function Winner({ status, players }) {
       }
     }
 
-    let singularPlural = winners.length > 1 ? '¡Son los mas pelados!' : '¡Sos el mas pelado!';
+    let singularPlural = winners.length > 1 ? '¡Son los más pelados!' : '¡Sos lo más pelado que hay!';
     return (
       <div className="App-game-gameroom-content-game-winners">
         <div>
