@@ -585,6 +585,7 @@ export function ContentGame({ setContent, roomId, roomCode, playerId }) {
       'name': jsonPlayer['player_name'],
       'score': jsonPlayer['score'],
       'is_finisher_ready': jsonPlayer['is_finisher_ready'],
+      'is_next_round_ready': jsonPlayer['is_next_round_ready'],
       'last_check': jsonPlayer['last_check']
     };
   }
@@ -695,8 +696,13 @@ export function ContentGame({ setContent, roomId, roomCode, playerId }) {
                   fetchOptions();
                 }
                 break;
-              case 'NOTIFY_WINNER':
+              case 'ROUND_WINNER':
                 setWaitingForDataSubmit(false);
+                break;
+              case 'GAME_WINNER':
+                if (playerId === responseOwnerId) {
+                  setWaitingForDataSubmit(false);
+                }
                 break;
               default:
                 console.error('Unknown status: ' + responseRoomStatus);
@@ -766,6 +772,7 @@ export function ContentGame({ setContent, roomId, roomCode, playerId }) {
                     return <span key={player.id}>
                       <PartyOwner isOwner={player.id === ownerId} />
                       <PartyLeader isLeader={player.id === leaderId} />
+                      <PlayerNextRoundStatus isReadyForNextRound={player.is_next_round_ready} status={roomStatus} />
                       <PlayerOptionStatus isLeader={player.id === leaderId} isFinisherReady={player.is_finisher_ready} status={roomStatus} />
                       <PlayerStatus last_check={player.last_check} />&nbsp;
                       <PlayerName player_name={player.name} last_check={player.last_check} />
@@ -781,7 +788,9 @@ export function ContentGame({ setContent, roomId, roomCode, playerId }) {
           <Prompt promptText={promptText} finishers={finishers} />
           <Finishers finishers={finishers} />
           <Options roomId={roomId} playerId={playerId} waitingForDataSubmit={waitingForDataSubmit} setWaitingForDataSubmit={setWaitingForDataSubmit} options={options} status={roomStatus} isLeader={playerId === leaderId} />
+          <Winner status={roomStatus} players={players}></Winner>
           <NextRoundButton roomId={roomId} playerId={playerId} waitingForDataSubmit={waitingForDataSubmit} setWaitingForDataSubmit={setWaitingForDataSubmit} status={roomStatus} isOwner={playerId === ownerId} isGameEnd={roundCount === roundTotal} />
+
         </div>
       </div>
       <div className="App-game-gameroom-footer">
@@ -796,10 +805,27 @@ export function ContentGame({ setContent, roomId, roomCode, playerId }) {
 export function PartyLeader({ isLeader }) {
   if (isLeader) {
     return (
-      <span title="Lider de la ronda">💎&nbsp;</span>
+      <span title="Líder de la ronda">💎&nbsp;</span>
     );
   } else {
     return;
+  }
+}
+
+export function PlayerNextRoundStatus({ isReadyForNextRound, status }) {
+  switch(status) {
+    case 'ROUND_WINNER':
+      if (isReadyForNextRound) {
+        return (
+          <span title="Listo para la siguiente ronda">✔️&nbsp;</span>
+        );
+      } else {
+        return (
+          <span title="Aun no esta listo para la siguiente ronda">⏳&nbsp;</span>
+        );
+      }
+    default:
+      return;
   }
 }
 
@@ -840,7 +866,7 @@ export function GameStatus({ status, isLeader, isOwner, waitingForDataSubmit }) 
   let active = false;
   switch(status) {
     case 'LEADER_OPTIONS':
-      phase = 'Inspiracion';
+      phase = 'Inspiración';
       if (isLeader) {
         active = true;
       }
@@ -852,13 +878,19 @@ export function GameStatus({ status, isLeader, isOwner, waitingForDataSubmit }) 
       }
       break;
     case 'LEADER_PICK':
-      phase = 'Votacion';
+      phase = 'Votación';
       if (isLeader) {
         active = true;
       }
       break;
-    case 'NOTIFY_WINNER':
+    case 'ROUND_WINNER':
       phase = 'Ganador';
+      if (!waitingForDataSubmit) {
+        active = true;
+      }
+      break;
+    case 'GAME_WINNER':
+      phase = 'Fin';
       if (isOwner) {
         active = true;
       }
@@ -1008,8 +1040,6 @@ export function Options({ roomId, playerId, waitingForDataSubmit, setWaitingForD
         showOptions = true;
       }
       break;
-    case 'NOTIFY_WINNER':
-      break;
     default:
       break;
   }
@@ -1030,6 +1060,45 @@ export function Options({ roomId, playerId, waitingForDataSubmit, setWaitingForD
             </div>
           })
         }
+      </div>
+    );
+  } else {
+    return;
+  }
+}
+
+export function Winner({ status, players }) {
+  if (status === 'GAME_WINNER') {
+    let highest = 0;
+    let winners = [];
+    for (let i = 0; i < players.length; i++) {
+      if (players[i].score > highest) {
+        highest = players[i].score;
+        winners = [players[i].name];
+      } else if (players[i].score === highest) {
+        winners.push(players[i].name);
+      }
+    }
+
+    let singularPlural = winners.length > 1 ? '¡Son los más pelados!' : '¡Sos lo más pelado que hay!';
+    return (
+      <div className="App-game-gameroom-content-game-winners">
+        <div>
+          ¡Felicidades&nbsp;
+          {
+            winners.map((winner, index) => {
+              return <span>
+                  { winners.length > 1 && index === winners.length - 1 ? ' y ' : '' }
+                  <span className='App-game-gameroom-content-game-winners-winner'>{winner}</span>
+                  { winners.length > 2 && index < winners.length - 1 ? ', ' : '' }
+                </span>
+            })
+          }
+          !
+        </div>
+        <div>
+          { singularPlural }
+        </div>
       </div>
     );
   } else {
@@ -1076,16 +1145,38 @@ export function NextRoundButton({ roomId, playerId, waitingForDataSubmit, setWai
     }
   }, [setWaitingForDataSubmit]);
 
-  if (isOwner && status === 'NOTIFY_WINNER') {
-    return (
-      <div className="App-game-gameroom-content-game-nextround">
-        <button className="App-game-gameroom-content-game-nextround-button" type="button" disabled={waitingForDataSubmit} onClick={_ => nextRound()}>
-          { isGameEnd ? 'Iniciar una nueva partida' : 'Iniciar la siguiente ronda' }
-        </button>
-      </div>
-    );
-  } else {
-    return;
+
+  switch(status) {
+    case 'ROUND_WINNER':
+      if (waitingForDataSubmit) {
+        return;
+      } else {
+        return (
+          <div className="App-game-gameroom-content-game-nextround">
+            <button className="App-game-gameroom-content-game-nextround-button" type="button" disabled={waitingForDataSubmit} onClick={_ => nextRound()}>
+              {isGameEnd ? 'Anunciar al ganador' : 'Listo para la siguiente ronda' }
+            </button>
+          </div>
+        );
+      }
+    case 'GAME_WINNER':
+      if (isOwner) {
+        if (waitingForDataSubmit) {
+          return;
+        } else {
+          return (
+            <div className="App-game-gameroom-content-game-nextround">
+              <button className="App-game-gameroom-content-game-nextround-button" type="button" disabled={waitingForDataSubmit} onClick={_ => nextRound()}>
+                Iniciar una nueva partida
+              </button>
+            </div>
+          );
+        }
+      } else {
+        return;
+      }
+    default:
+      break;
   }
 }
 
@@ -1102,7 +1193,7 @@ export function Instruction({ status, optionsFound, isLeader, isOwner, isGameEnd
           instruction = 'Obteniendo inspiraciones';
         }
       } else {
-        instruction = 'Esperando a que el lider seleccione una inspiracion'
+        instruction = 'Esperando a que el líder seleccione una inspiracion'
       }
       break;
     case 'LACKEY_OPTIONS':
@@ -1114,7 +1205,8 @@ export function Instruction({ status, optionsFound, isLeader, isOwner, isGameEnd
             instruction = 'Esperando a que los otros secuaces envien su remate.';
           } else {
             active = true;
-            instruction = 'Selecciona un remate para que lo vea el lider.';
+            // How about "completa la frase con tu mejor remate"?
+            instruction = 'Selecciona un remate para que lo vea el líder.';
           }
         } else {
           instruction = 'Obteniendo remates';
@@ -1130,19 +1222,32 @@ export function Instruction({ status, optionsFound, isLeader, isOwner, isGameEnd
           instruction = 'Selecciona el remate ganador.';
         }
       } else {
-        instruction = 'Esperando a que el lider seleccione un remate ganador'
+        instruction = 'Esperando a que el líder seleccione un remate ganador'
       }
       break;
-    case 'NOTIFY_WINNER':
+    case 'ROUND_WINNER':
+      if (isGameEnd) {
+        if (waitingForDataSubmit) {
+          instruction = 'Esperando a los demas jugadores para anunciar al ganador';
+        } else {
+          active = true;
+          instruction = 'Indica que estas listo para anunciar al ganador';
+        }
+      } else {
+        if (waitingForDataSubmit) {
+          instruction = 'Esperando a los demas jugadores para iniciar la siguiente ronda';
+        } else {
+          active = true;
+          instruction = 'Indica que estas listo para iniciar la siguiente ronda';
+        }
+      }
+      break;
+    case 'GAME_WINNER':
       if (isOwner) {
         active = true;
         instruction = 'Inicia una nueva ronda para continuar jugando.';
       } else {
-        if (isGameEnd) {
-          instruction = 'Espere a que el dueño de la partida inicie una nueva partida';
-        } else {
-          instruction = 'Espere a que el dueño de la partida inicie la siguiente ronda';
-        }
+        instruction = 'Espere a que el dueño de la partida inicie una nueva partida';
       }
       break;
     default:

@@ -534,7 +534,6 @@
   display: flex;
   justify-content: space-evenly;
   flex-direction: column;
-
 }
 
 .App-game-gameroom-content-game-choices-finisher {
@@ -720,13 +719,44 @@
   color: #000;
 }
 
+.App-game-gameroom-content-game-winners {
+  width: 100%;
+  margin-bottom: 16px;
+
+  font-weight: 750;
+  font-size: 32px;
+  color: #000;
+  text-shadow: 2px 2px 1px #ccc;
+  background-color: #fff;
+}
+
+.App-game-gameroom-content-game-winners-winner {
+  color: #c7ca00;
+  text-shadow: 2px 2px 1px #000;
+
+  animation-name: winners-winnerplayer;
+  animation-duration: 1s;
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+  animation-timing-function: ease-in-out;
+}
+
+@keyframes winners-winnerplayer {
+  from {
+    color: #c7ca00;
+  }
+  to {
+    color: #f1f500;
+  }
+}
+
 .App-game-gameroom-content-game-nextround {
   display: flex;
   flex-direction: row;
   justify-content: center;
   align-items: flex-start;
 
-  width: 320px;
+  width: 380px;
   margin-top: 24px;
 }
 
