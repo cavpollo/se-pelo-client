@@ -1,3 +1,7 @@
+body {
+  background-color: #282c34;
+}
+
 .App {
   display: flex;
   flex-flow: column;
@@ -7,7 +11,6 @@
   max-height: 100vh;
   min-height: 100vh;
 
-  background-color: #282c34;
   color: white;
 }
 
@@ -45,8 +48,8 @@
 
   height: 100%;
   width: min(100%,1200px);
-  margin-top: 10px;
-  margin-bottom: 10px;
+  margin-top: 12px;
+  margin-bottom: 12px;
 
   text-align: center;
   justify-content: center;
@@ -474,6 +477,8 @@
   align-items: flex-end;
   flex: 1 1 auto;
 
+  margin-top: 12px;
+  margin-bottom: 12px;
   width: 100%;
 }
 
@@ -566,27 +571,28 @@
   flex-direction: column;
   align-items: center;
   flex: 1 1 auto;
+  row-gap: 32px;
 
   width: 100%;
 }
 
 .App-game-gameroom-content-game-choices {
-  /* width: 100%; */
-  height: 100%;
+  display: flex;
+  column-gap: 16px;
 }
 
 .App-game-gameroom-content-game-choices-prompt {
-  display: flex;
-  justify-content: space-evenly;
+  justify-content: center;
   flex-direction: column;
+  row-gap: 32px;
 }
 
 .App-game-gameroom-content-game-choices-finisher {
-  display: flex;
-  justify-content: space-evenly;
+  justify-content: center;
   flex-direction: row;
   flex-wrap: wrap;
   align-content: center;
+  row-gap: 16px;
 }
 
 .App-game-gameroom-content-game-choices-choice {
@@ -596,7 +602,6 @@
   align-items: flex-start;
 
   border-radius: 16px;
-  margin-bottom: 16px;
 }
 
 .App-game-gameroom-content-game-choices-choice-button {
@@ -662,8 +667,11 @@
 }
 
 .App-game-gameroom-content-game-prompt {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
   width: 100%;
-  margin-bottom: 16px;
 
   font-weight: 750;
   font-size: 32px;
@@ -716,7 +724,6 @@
   width: 220px;
 
   background-color: #a79883;
-
   border-radius: 16px;
 }
 
@@ -766,7 +773,6 @@
 
 .App-game-gameroom-content-game-winners {
   width: 100%;
-  margin-bottom: 16px;
 
   font-weight: 750;
   font-size: 32px;
@@ -802,7 +808,6 @@
   align-items: flex-start;
 
   width: 380px;
-  margin-top: 24px;
 }
 
 .App-game-gameroom-content-game-nextround-button {
