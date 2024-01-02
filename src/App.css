@@ -321,8 +321,24 @@
   border-radius: 0px 0px 16px 16px;
 }
 
-.App-game-waitroom-form-players-list-lag {
+.App-game-waitroom-form-players-list-inner {
+  display: block;
+}
+
+.App-game-waitroom-form-players-list-inner-player {
+  display: flex;
+  justify-content: flex-start;
+  flex-direction: row;
+  column-gap: 4px;
+}
+
+.App-game-waitroom-form-players-list-inner-player-lag {
   color: #cfcfcf;
+}
+
+.App-game-waitroom-form-players-list-inner-player-icon {
+  height: 21px;
+  width: 22px;
 }
 
 .App-game-waitroom-form-warning {

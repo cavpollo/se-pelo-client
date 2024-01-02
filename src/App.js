@@ -374,15 +374,17 @@ export function ContentWait({ setContent, roomId, roomCode, playerId }) {
             </div>
           </div>
           <div className="App-game-waitroom-form-players-list">
-            {
-              players.map((player) => {
-                return <span key={player.id}>
-                  <PartyOwner isOwner={player.id === ownerId} />&nbsp;
-                  <PlayerStatus last_check={player.last_check} />&nbsp;
-                  <PlayerName player_name={player.name} last_check={player.last_check} />
-                </span>
-              })
-            }
+            <div className="App-game-waitroom-form-players-list-inner">
+              {
+                players.map((player) => {
+                  return <div key={player.id} className="App-game-waitroom-form-players-list-inner-player">
+                    <PartyOwner isOwner={player.id === ownerId} />
+                    <PlayerStatus last_check={player.last_check} />
+                    <PlayerName player_name={player.name} last_check={player.last_check} />
+                  </div>
+                })
+              }
+            </div>
           </div>
         </div>
         <GameStartWarning players={players} />
@@ -395,19 +397,21 @@ export function ContentWait({ setContent, roomId, roomCode, playerId }) {
 export function PartyOwner({ isOwner }) {
   if (isOwner) {
     return (
-      <span title="Dueño de la partida">🎩</span>
+      <div className="App-game-waitroom-form-players-list-inner-player-icon" title="Dueño de la partida">🎩</div>
     );
   } else {
-    return;
+    return (
+      <div className="App-game-waitroom-form-players-list-inner-player-icon"></div>
+    );
   }
 }
 
 export function PlayerName({ player_name, last_check }) {
   if (last_check < 10) {
-    return player_name;
+    return (<div>{player_name}</div>);
   } else {
     return (
-      <em className="App-game-waitroom-form-players-list-lag">{player_name}</em>
+      <div><em className="App-game-waitroom-form-players-list-inner-player-lag">{player_name}</em></div>
     );
   }
 }
@@ -415,11 +419,11 @@ export function PlayerName({ player_name, last_check }) {
 export function PlayerStatus({ last_check }) {
   if (last_check < 10) {
     return (
-      <span title="Usuario activo">🟢</span>
+      <div className="App-game-waitroom-form-players-list-inner-player-icon" title="Usuario activo">🟢</div>
     );
   } else {
     return (
-      <span title="Usuario inactivo">💤</span>
+      <div className="App-game-waitroom-form-players-list-inner-player-icon" title="Usuario inactivo">💤</div>
     );
   }
 }
