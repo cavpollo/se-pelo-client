@@ -1,12 +1,68 @@
-import { useState, useCallback, useEffect, useRef } from 'react';
+import { useState, useLayoutEffect, useCallback, useEffect, useRef } from 'react';
 
 import './App.css';
 
 function App() {
+  const isEventListenerConnected = useRef(false);
+  const isFulllScreenRef = useRef(false);
+  const [isFulllScreen, setFulllScreen] = useState(false);
+
+  const yourCheckFunction = ((isFulllScreenRef, setFulllScreen) => {
+    isFulllScreenRef.current = !isFulllScreenRef.current;
+    setFulllScreen(isFulllScreenRef.current);
+  });
+
+  let addEvent = ((contentElement, isFulllScreenRef, setFulllScreen) => {
+    let requestEvent = ['onfullscreenchange', 'onwebkitfullscreenchange', 'onmozfullscreenchange', 'onmsfullscreenchange'];
+    for (const key in contentElement) {
+      if (requestEvent.includes(key)) {
+        // Add events until something sticks...
+        contentElement.addEventListener(key.substring(2), (e) => yourCheckFunction(isFulllScreenRef, setFulllScreen));
+      }
+    }
+  });
+
+  useEffect(() => {
+    if (!isEventListenerConnected.current) {
+      let contentElement = document.getElementById('app');
+      if (contentElement) {
+        addEvent(contentElement, isFulllScreenRef, setFulllScreen);
+        isEventListenerConnected.current = true;
+      }
+    }
+  }, [isEventListenerConnected, isFulllScreenRef, setFulllScreen]);
+
+
+  const fullScreen = useCallback(() => {
+    let contentElement = document.getElementById('app');
+    if (isFulllScreen) {
+      let requestMethod = document.cancelFullScreen || document.webkitCancelFullScreen || document.mozCancelFullScreen || document.msExitFullscreen;
+
+      if (requestMethod) {
+        requestMethod.call(document);
+      } else {
+        console.error("No exit full screen fuction");
+      }
+    } else {
+      let requestMethod = contentElement.requestFullScreen || contentElement.webkitRequestFullScreen || contentElement.mozRequestFullScreen || contentElement.msRequestFullScreen;
+
+      if (requestMethod) {
+          requestMethod.call(contentElement);
+      } else {
+        console.error("No enter full screen fuction");
+      }
+    }
+  }, [isFulllScreen, setFulllScreen]);
+
   return (
-    <div className="App">
+    <div id="app" className="App">
       <header className="App-header">
-        ¡Se peló!
+        <div>¡Se peló!</div>
+        <div className="App-header-fullscreen">
+          <div className="App-header-fullscreen-inner">
+            <button className="App-header-fullscreen-inner-button" title={ isFulllScreen ? 'Entrar a pantalla completa' : 'Salir de pantalla completa' } onClick={_ => fullScreen()}>{ isFulllScreen ? '🔳' : '🔲' }</button>
+          </div>
+        </div>
       </header>
       <main className="App-content">
         <ContentResource />
