@@ -805,7 +805,7 @@ export function ContentGame({ setContent, roomId, roomCode, playerId }) {
 export function PartyLeader({ isLeader }) {
   if (isLeader) {
     return (
-      <span title="Lider de la ronda">💎&nbsp;</span>
+      <span title="Líder de la ronda">💎&nbsp;</span>
     );
   } else {
     return;
@@ -1193,7 +1193,7 @@ export function Instruction({ status, optionsFound, isLeader, isOwner, isGameEnd
           instruction = 'Obteniendo inspiraciones';
         }
       } else {
-        instruction = 'Esperando a que el lider seleccione una inspiracion'
+        instruction = 'Esperando a que el líder seleccione una inspiracion'
       }
       break;
     case 'LACKEY_OPTIONS':
@@ -1205,7 +1205,8 @@ export function Instruction({ status, optionsFound, isLeader, isOwner, isGameEnd
             instruction = 'Esperando a que los otros secuaces envien su remate.';
           } else {
             active = true;
-            instruction = 'Selecciona un remate para que lo vea el lider.';
+            // How about "completa la frase con tu mejor remate"?
+            instruction = 'Selecciona un remate para que lo vea el líder.';
           }
         } else {
           instruction = 'Obteniendo remates';
@@ -1221,7 +1222,7 @@ export function Instruction({ status, optionsFound, isLeader, isOwner, isGameEnd
           instruction = 'Selecciona el remate ganador.';
         }
       } else {
-        instruction = 'Esperando a que el lider seleccione un remate ganador'
+        instruction = 'Esperando a que el líder seleccione un remate ganador'
       }
       break;
     case 'ROUND_WINNER':
