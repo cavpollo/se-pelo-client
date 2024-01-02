@@ -12,7 +12,7 @@ function App() {
         <ContentResource />
       </main>
       <footer className="App-footer">
-        ¡Se peló!
+        ¡Se peló! version beta
       </footer>
     </div>
   );
@@ -1037,10 +1037,12 @@ export function Options({ roomId, playerId, waitingForDataSubmit, setWaitingForD
   }, [setWaitingForDataSubmit]);
 
   let showOptions = false;
+  let isPrompt = false;
   switch(status) {
     case 'LEADER_OPTIONS':
       if (isLeader) {
         showOptions = true;
+        isPrompt = true;
       }
       break;
     case 'LACKEY_OPTIONS':
@@ -1058,7 +1060,7 @@ export function Options({ roomId, playerId, waitingForDataSubmit, setWaitingForD
   }
 
   if (options.length > 0 && showOptions) {
-    const choicesClass = 'App-game-gameroom-content-game-choices' + (isLeader ? ' App-game-gameroom-content-game-choices-prompt' : ' App-game-gameroom-content-game-choices-finisher');
+    const choicesClass = 'App-game-gameroom-content-game-choices' + (isPrompt ? ' App-game-gameroom-content-game-choices-prompt' : ' App-game-gameroom-content-game-choices-finisher');
     return (
       <div className={choicesClass}>
         {
