@@ -367,19 +367,23 @@ export function ContentWait({ setContent, roomId, roomCode, playerId }) {
         <div className="App-game-waitroom-form-subtitle">
           Codigo de sala: <span className="App-game-waitroom-form-subtitle-code">{roomCode}</span>
         </div>
-        <div className="App-game-waitroom-form-subtitle">
-          Jugadores
-        </div>
-        <div className="App-game-waitroom-form-list">
-          {
-            players.map((player) => {
-              return <span key={player.id}>
-                <PartyOwner isOwner={player.id === ownerId} />
-                <PlayerName player_name={player.name} last_check={player.last_check} />&nbsp;
-                <PlayerStatus last_check={player.last_check} />
-              </span>
-            })
-          }
+        <div className="App-game-waitroom-form-players">
+          <div className="App-game-waitroom-form-players-title">
+            <div className="App-game-waitroom-form-players-title-inner">
+              Jugadores
+            </div>
+          </div>
+          <div className="App-game-waitroom-form-players-list">
+            {
+              players.map((player) => {
+                return <span key={player.id}>
+                  <PartyOwner isOwner={player.id === ownerId} />&nbsp;
+                  <PlayerStatus last_check={player.last_check} />&nbsp;
+                  <PlayerName player_name={player.name} last_check={player.last_check} />
+                </span>
+              })
+            }
+          </div>
         </div>
         <GameStartWarning players={players} />
         <GameStartButton isOwner={playerId === ownerId} playerId={playerId} roomId={roomId} players={players} />
@@ -391,7 +395,7 @@ export function ContentWait({ setContent, roomId, roomCode, playerId }) {
 export function PartyOwner({ isOwner }) {
   if (isOwner) {
     return (
-      <span title="Dueño de la partida">🎩&nbsp;</span>
+      <span title="Dueño de la partida">🎩</span>
     );
   } else {
     return;
@@ -403,7 +407,7 @@ export function PlayerName({ player_name, last_check }) {
     return player_name;
   } else {
     return (
-      <em className="App-game-waitroom-form-list-lag">{player_name}</em>
+      <em className="App-game-waitroom-form-players-list-lag">{player_name}</em>
     );
   }
 }
@@ -426,11 +430,11 @@ export function GameStartWarning({ players }) {
   } else {
     return (
       <div className="App-game-waitroom-form-warning">
-        <div>⚠️</div>
+        <div className="App-game-waitroom-form-warning-icon">⚠️</div>
         <div className="App-game-waitroom-form-warning-text">
            Se necesitan almenos 3 jugadores para iniciar la partida.
         </div>
-        <div>⚠️</div>
+        <div className="App-game-waitroom-form-warning-icon">⚠️</div>
       </div>
     );
   }

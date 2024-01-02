@@ -63,8 +63,10 @@
   display: flex;
   flex-direction: row;
   align-items: center;
+  column-gap: 16px;
 
   width: 100%;
+  margin: 16px;
 }
 
 .App-game-menu-option {
@@ -73,7 +75,7 @@
   width: 100%;
   height: 100%;
   max-height: 320px;
-  margin: 5px;
+  /* margin: 5px; */
 }
 
 .App-game-menu-option-button {
@@ -119,7 +121,7 @@
   align-items: center;
 
   width: 100%;
-  margin: 5px;
+  margin: 8px;
 }
 
 .App-game-option-back {
@@ -171,13 +173,12 @@
   flex-direction: column;
   align-items: center;
   flex: 1 1 auto;
+  row-gap: 32px;
 }
 
 .App-game-option-form-title {
   font-size: 1.5rem;
   font-weight: 500;
-
-  margin-bottom: 20px;
 
   color: #fff;
 }
@@ -187,10 +188,11 @@
   justify-content: center;
   flex-direction: column;
   align-items: flex-end;
+
+  row-gap: 12px;
 }
 
 .App-game-option-form-input-label {
-  margin-top: 12px;
 
   font-size: 1.0rem;
   font-weight: 500;
@@ -199,7 +201,6 @@
 }
 
 .App-game-option-form-content {
-  margin-top: 36px;
 }
 
 .App-game-option-form-button {
@@ -243,13 +244,14 @@
 }
 
 /*
-* Game Room
+* Waiting Room
 */
 
 .App-game-waitroom {
   display: flex;
 
   width: 100%;
+  margin: 8px;
 }
 
 
@@ -258,6 +260,7 @@
   justify-content: center;
   flex-direction: column;
   align-items: center;
+  row-gap: 16px;
 
   width: 100%;
 }
@@ -266,17 +269,12 @@
   font-size: 1.5rem;
   font-weight: 500;
 
-  margin-top: 20px;
-  margin-bottom: 20px;
-
   color: #fff;
 }
 
 .App-game-waitroom-form-subtitle {
   font-size: 1.0rem;
   font-weight: 500;
-
-  margin-bottom: 12px;
 
   color: #fff;
 }
@@ -287,20 +285,43 @@
   color: #ff0000;
 }
 
-.App-game-waitroom-form-list {
+.App-game-waitroom-form-players {
+  display: flex;
+  justify-content: flex-start;
+  flex-direction: column;
+  align-items: center;
+  flex: 1 1 auto;
+}
+
+.App-game-waitroom-form-players-title {
+  font-size: 1.0rem;
+  font-weight: 500;
+
+  width: 100%;
+
+  color: #fff;
+  background-color: #007fd3;
+  border-radius: 16px 16px 0px 0px;
+}
+.App-game-waitroom-form-players-title-inner {
+  padding: 8px;
+}
+
+.App-game-waitroom-form-players-list {
   display: flex;
   justify-content: flex-start;
   flex-direction: column;
   align-items: center;
   flex: 1 1 auto;
 
+  padding: 8px;
   width: 320px;
-  margin-bottom: 20px;
 
   background-color: #282c34;
+  border-radius: 0px 0px 16px 16px;
 }
 
-.App-game-waitroom-form-list-lag {
+.App-game-waitroom-form-players-list-lag {
   color: #cfcfcf;
 }
 
@@ -311,11 +332,14 @@
   align-items: center;
 
   width: 320px;
-  margin-bottom: 20px;
   padding: 5px;
 
   font-weight: 500;
   background-color: #854e07;
+}
+
+.App-game-waitroom-form-warning-icon {
+  font-size: 1.5rem;
 }
 
 .App-game-waitroom-form-warning-text {
@@ -336,7 +360,7 @@
 }
 
 .App-game-waitroom-form-actions {
-  margin-bottom: 20px;
+
 }
 
 .App-game-waitroom-form-button {
@@ -378,6 +402,10 @@
   background-color: #353535;
   box-shadow: inset 0px 0px 0px 0px #999;
 }
+
+/*
+* Game Room
+*/
 
 .App-game-gameroom {
   display: flex;
