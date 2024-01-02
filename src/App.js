@@ -755,7 +755,7 @@ export function ContentGame({ setContent, roomId, roomCode, playerId }) {
     <div className="App-game-gameroom">
       <div className="App-game-gameroom-header">
         <div className="App-game-gameroom-header-element App-game-gameroom-header-element-roomcode">
-          Codigo de sala:&nbsp;<span className="App-game-gameroom-header-code">{roomCode}</span>
+          Código de sala:&nbsp;<span className="App-game-gameroom-header-code">{roomCode}</span>
         </div>
         <div className="App-game-gameroom-header-element App-game-gameroom-header-element-phase">
           <span>Fase:&nbsp;</span>
@@ -777,15 +777,15 @@ export function ContentGame({ setContent, roomId, roomCode, playerId }) {
               <div className="App-game-gameroom-content-playerslist-inner-list-inner">
                 {
                   players.map((player) => {
-                    return <span key={player.id}>
+                    return <div key={player.id} className="App-game-gameroom-content-playerslist-inner-list-inner-player">
                       <PartyOwner isOwner={player.id === ownerId} />
                       <PartyLeader isLeader={player.id === leaderId} />
                       <PlayerNextRoundStatus isReadyForNextRound={player.is_next_round_ready} status={roomStatus} />
                       <PlayerOptionStatus isLeader={player.id === leaderId} isFinisherReady={player.is_finisher_ready} status={roomStatus} />
-                      <PlayerStatus last_check={player.last_check} />&nbsp;
+                      <PlayerStatus last_check={player.last_check} />
                       <PlayerName player_name={player.name} last_check={player.last_check} />
                       : {player.score}
-                    </span>
+                    </div>
                   })
                 }
               </div>
@@ -798,7 +798,6 @@ export function ContentGame({ setContent, roomId, roomCode, playerId }) {
           <Options roomId={roomId} playerId={playerId} waitingForDataSubmit={waitingForDataSubmit} setWaitingForDataSubmit={setWaitingForDataSubmit} options={options} status={roomStatus} isLeader={playerId === leaderId} />
           <Winner status={roomStatus} players={players}></Winner>
           <NextRoundButton roomId={roomId} playerId={playerId} waitingForDataSubmit={waitingForDataSubmit} setWaitingForDataSubmit={setWaitingForDataSubmit} status={roomStatus} isOwner={playerId === ownerId} isGameEnd={roundCount === roundTotal} />
-
         </div>
       </div>
       <div className="App-game-gameroom-footer">
@@ -813,10 +812,10 @@ export function ContentGame({ setContent, roomId, roomCode, playerId }) {
 export function PartyLeader({ isLeader }) {
   if (isLeader) {
     return (
-      <span title="Líder de la ronda">💎&nbsp;</span>
+      <div className="App-game-waitroom-form-players-list-inner-player-icon" title="Líder de la ronda">💎&nbsp;</div>
     );
   } else {
-    return;
+    return (<div className="App-game-waitroom-form-players-list-inner-player-icon"></div>);
   }
 }
 
@@ -825,47 +824,53 @@ export function PlayerNextRoundStatus({ isReadyForNextRound, status }) {
     case 'ROUND_WINNER':
       if (isReadyForNextRound) {
         return (
-          <span title="Listo para la siguiente ronda">✔️&nbsp;</span>
+          <div className="App-game-waitroom-form-players-list-inner-player-icon" title="Listo para la siguiente ronda">✔️&nbsp;</div>
         );
       } else {
         return (
-          <span title="Aun no esta listo para la siguiente ronda">⏳&nbsp;</span>
+          <div className="App-game-waitroom-form-players-list-inner-player-icon" title="Aun no esta listo para la siguiente ronda">⏳&nbsp;</div>
         );
       }
     default:
-      return;
+      // No need for a placeholder. Both Owner/Leader and non-Owner/Leader get the icons.
+      return ;
   }
 }
 
 export function PlayerOptionStatus({ isLeader, isFinisherReady, status }) {
-  if (isLeader) {
-    switch(status) {
-      case 'LEADER_OPTIONS':
+  switch(status) {
+    case 'LEADER_OPTIONS':
+      if (isLeader) {
         return (
-          <span title="Seleccionando la inspiracion">⏳&nbsp;</span>
+          <div className="App-game-waitroom-form-players-list-inner-player-icon" title="Seleccionando la inspiracion">⏳</div>
         );
-      case 'LEADER_PICK':
-        return (
-          <span title="Seleccionando el remate ganador">⚖️&nbsp;</span>
-        );
-      default:
-        return;
-    }
-  } else {
-    switch(status) {
-      case 'LACKEY_OPTIONS':
+      } else {
+        return (<div className="App-game-waitroom-form-players-list-inner-player-icon"></div>);
+      }
+    case 'LACKEY_OPTIONS':
+      if (!isLeader) {
         if (isFinisherReady) {
           return (
-            <span title="Remate listo">✔️&nbsp;</span>
+            <div className="App-game-waitroom-form-players-list-inner-player-icon" title="Remate listo">✔️</div>
           );
         } else {
           return (
-            <span title="Seleccionando un remate">⏳&nbsp;</span>
+            <div className="App-game-waitroom-form-players-list-inner-player-icon" title="Seleccionando un remate">⏳</div>
           );
         }
-      default:
-        return;
-    }
+      } else {
+        return (<div className="App-game-waitroom-form-players-list-inner-player-icon"></div>);
+      }
+    case 'LEADER_PICK':
+      if (isLeader) {
+        return (
+          <div className="App-game-waitroom-form-players-list-inner-player-icon" title="Seleccionando el remate ganador">⚖️</div>
+        );
+      } else {
+        return (<div className="App-game-waitroom-form-players-list-inner-player-icon"></div>);
+      }
+    default:
+      return;
   }
 }
 

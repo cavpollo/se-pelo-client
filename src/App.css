@@ -524,7 +524,7 @@
   flex-direction: column;
   align-items: center;
 
-  width: 240px;
+  width: 280px;
 }
 
 .App-game-gameroom-content-playerslist-inner-title {
@@ -537,7 +537,7 @@
   font-size: 1.0rem;
   font-weight: 500;
 
-  padding: 8px;
+  padding: 4px;
 }
 
 .App-game-gameroom-content-playerslist-inner-list {
@@ -549,14 +549,15 @@
 }
 
 .App-game-gameroom-content-playerslist-inner-list-inner {
+  display: block;
+  padding: 4px;
+}
+
+.App-game-gameroom-content-playerslist-inner-list-inner-player {
   display: flex;
   justify-content: flex-start;
-  flex-direction: column;
-  align-items: center;
-  flex: 1 1 auto;
-
-  width: 100%;
-  padding: 8px;
+  flex-direction: row;
+  column-gap: 2px;
 }
 
 .App-game-gameroom-content-game {
