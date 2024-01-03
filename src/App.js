@@ -1,4 +1,4 @@
-import { useState, useLayoutEffect, useCallback, useEffect, useRef } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 
 import './App.css';
 
@@ -7,17 +7,17 @@ function App() {
   const isFulllScreenRef = useRef(false);
   const [isFulllScreen, setFulllScreen] = useState(false);
 
-  const yourCheckFunction = ((isFulllScreenRef, setFulllScreen) => {
+  const fullScreenChangeListener = ((isFulllScreenRef, setFulllScreen) => {
     isFulllScreenRef.current = !isFulllScreenRef.current;
     setFulllScreen(isFulllScreenRef.current);
   });
 
-  let addEvent = ((contentElement, isFulllScreenRef, setFulllScreen) => {
+  const registerFullScreenChangeListener = ((contentElement, isFulllScreenRef, setFulllScreen) => {
     let requestEvent = ['onfullscreenchange', 'onwebkitfullscreenchange', 'onmozfullscreenchange', 'onmsfullscreenchange'];
     for (const key in contentElement) {
       if (requestEvent.includes(key)) {
         // Add events until something sticks...
-        contentElement.addEventListener(key.substring(2), (e) => yourCheckFunction(isFulllScreenRef, setFulllScreen));
+        contentElement.addEventListener(key.substring(2), () => fullScreenChangeListener(isFulllScreenRef, setFulllScreen));
       }
     }
   });
@@ -26,33 +26,31 @@ function App() {
     if (!isEventListenerConnected.current) {
       let contentElement = document.getElementById('app');
       if (contentElement) {
-        addEvent(contentElement, isFulllScreenRef, setFulllScreen);
+        registerFullScreenChangeListener(contentElement, isFulllScreenRef, setFulllScreen);
         isEventListenerConnected.current = true;
       }
     }
   }, [isEventListenerConnected, isFulllScreenRef, setFulllScreen]);
 
 
-  const fullScreen = useCallback(() => {
-    let contentElement = document.getElementById('app');
+  const toggleFullScreen = useCallback(() => {
     if (isFulllScreen) {
       let requestMethod = document.cancelFullScreen || document.webkitCancelFullScreen || document.mozCancelFullScreen || document.msExitFullscreen;
-
       if (requestMethod) {
         requestMethod.call(document);
       } else {
-        console.error("No exit full screen fuction");
+        console.error("No exit full screen function");
       }
     } else {
+      let contentElement = document.getElementById('app');
       let requestMethod = contentElement.requestFullScreen || contentElement.webkitRequestFullScreen || contentElement.mozRequestFullScreen || contentElement.msRequestFullScreen;
-
       if (requestMethod) {
           requestMethod.call(contentElement);
       } else {
-        console.error("No enter full screen fuction");
+        console.error("No enter full screen function");
       }
     }
-  }, [isFulllScreen, setFulllScreen]);
+  }, [isFulllScreen]);
 
   return (
     <div id="app" className="App">
@@ -60,7 +58,7 @@ function App() {
         <div>¡Se peló!</div>
         <div className="App-header-fullscreen">
           <div className="App-header-fullscreen-inner">
-            <button className="App-header-fullscreen-inner-button" title={ isFulllScreen ? 'Entrar a pantalla completa' : 'Salir de pantalla completa' } onClick={_ => fullScreen()}>{ isFulllScreen ? '🔳' : '🔲' }</button>
+            <button className="App-header-fullscreen-inner-button" title={ isFulllScreen ? 'Entrar a pantalla completa' : 'Salir de pantalla completa' } onClick={toggleFullScreen}>{ isFulllScreen ? '🔳' : '🔲' }</button>
           </div>
         </div>
       </header>
