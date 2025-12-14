@@ -189,10 +189,10 @@ export function ContentCreate({ setContent, setRoomId, setRoomCode, setPlayerId 
     console.log(request);
 
     try {
-      const response = await fetch(process.env.REACT_APP_SERVER_BASE_URL + "/room-create", {
+      const response = await fetch(import.meta.env.VITE_APP_SERVER_BASE_URL + "/room-create", {
         method: "POST",
         headers: {
-          "Access-Control-Allow-Origin": process.env.REACT_APP_ACCESS_CONTROL_ALLOW_ORIGIN,
+          "Access-Control-Allow-Origin": import.meta.env.VITE_APP_ACCESS_CONTROL_ALLOW_ORIGIN,
           "Content-type": "application/json; charset=UTF-8",
           "Accept": "application/json"
         },
@@ -279,10 +279,10 @@ export function ContentJoin({ setContent, setRoomId, roomCode, setRoomCode, setP
     console.log(request);
 
     try {
-      const response = await fetch(process.env.REACT_APP_SERVER_BASE_URL + "/room-join", {
+      const response = await fetch(import.meta.env.VITE_APP_SERVER_BASE_URL + "/room-join", {
         method: "POST",
         headers: {
-          "Access-Control-Allow-Origin": process.env.REACT_APP_ACCESS_CONTROL_ALLOW_ORIGIN,
+          "Access-Control-Allow-Origin": import.meta.env.VITE_APP_ACCESS_CONTROL_ALLOW_ORIGIN,
           "Content-type": "application/json; charset=UTF-8",
           "Accept": "application/json"
         },
@@ -389,10 +389,10 @@ export function ContentWait({ setContent, roomId, roomCode, playerId }) {
       // console.log(request);
 
       try {
-        const response = await fetch(process.env.REACT_APP_SERVER_BASE_URL + "/room-check", {
+        const response = await fetch(import.meta.env.VITE_APP_SERVER_BASE_URL + "/room-check", {
           method: "POST",
           headers: {
-            "Access-Control-Allow-Origin": process.env.REACT_APP_ACCESS_CONTROL_ALLOW_ORIGIN,
+            "Access-Control-Allow-Origin": import.meta.env.VITE_APP_ACCESS_CONTROL_ALLOW_ORIGIN,
             "Content-type": "application/json; charset=UTF-8",
             "Accept": "application/json"
           },
@@ -584,10 +584,10 @@ export function GameStartButton({ isOwner, playerId, roomId, players }) {
     console.log(request);
 
     try {
-      const response = await fetch(process.env.REACT_APP_SERVER_BASE_URL + "/game-start", {
+      const response = await fetch(import.meta.env.VITE_APP_SERVER_BASE_URL + "/game-start", {
         method: "POST",
         headers: {
-          "Access-Control-Allow-Origin": process.env.REACT_APP_ACCESS_CONTROL_ALLOW_ORIGIN,
+          "Access-Control-Allow-Origin": import.meta.env.VITE_APP_ACCESS_CONTROL_ALLOW_ORIGIN,
           "Content-type": "application/json; charset=UTF-8"
         },
         body: JSON.stringify(request)
@@ -667,10 +667,10 @@ export function ContentGame({ setContent, roomId, roomCode, playerId }) {
     console.log(request);
 
     try {
-      const response = await fetch(process.env.REACT_APP_SERVER_BASE_URL + "/game-options", {
+      const response = await fetch(import.meta.env.VITE_APP_SERVER_BASE_URL + "/game-options", {
         method: "POST",
         headers: {
-          "Access-Control-Allow-Origin": process.env.REACT_APP_ACCESS_CONTROL_ALLOW_ORIGIN,
+          "Access-Control-Allow-Origin": import.meta.env.VITE_APP_ACCESS_CONTROL_ALLOW_ORIGIN,
           "Content-type": "application/json; charset=UTF-8",
           "Accept": "application/json"
         },
@@ -735,10 +735,10 @@ export function ContentGame({ setContent, roomId, roomCode, playerId }) {
       // console.log(request);
 
       try {
-        const response = await fetch(process.env.REACT_APP_SERVER_BASE_URL + "/room-check", {
+        const response = await fetch(import.meta.env.VITE_APP_SERVER_BASE_URL + "/room-check", {
           method: "POST",
           headers: {
-            "Access-Control-Allow-Origin": process.env.REACT_APP_ACCESS_CONTROL_ALLOW_ORIGIN,
+            "Access-Control-Allow-Origin": import.meta.env.VITE_APP_ACCESS_CONTROL_ALLOW_ORIGIN,
             "Content-type": "application/json; charset=UTF-8",
             "Accept": "application/json"
           },
@@ -1123,10 +1123,10 @@ export function Options({ roomId, playerId, waitingForDataSubmit, setWaitingForD
     console.log(request);
 
     try {
-      const response = await fetch(process.env.REACT_APP_SERVER_BASE_URL + "/game-pick", {
+      const response = await fetch(import.meta.env.VITE_APP_SERVER_BASE_URL + "/game-pick", {
         method: "POST",
         headers: {
-          "Access-Control-Allow-Origin": process.env.REACT_APP_ACCESS_CONTROL_ALLOW_ORIGIN,
+          "Access-Control-Allow-Origin": import.meta.env.VITE_APP_ACCESS_CONTROL_ALLOW_ORIGIN,
           "Content-type": "application/json; charset=UTF-8"
         },
         body: JSON.stringify(request)
@@ -1247,10 +1247,10 @@ export function NextRoundButton({ roomId, playerId, waitingForDataSubmit, setWai
     console.log(request);
 
     try {
-      const response = await fetch(process.env.REACT_APP_SERVER_BASE_URL + "/game-start", {
+      const response = await fetch(import.meta.env.VITE_APP_SERVER_BASE_URL + "/game-start", {
         method: "POST",
         headers: {
-          "Access-Control-Allow-Origin": process.env.REACT_APP_ACCESS_CONTROL_ALLOW_ORIGIN,
+          "Access-Control-Allow-Origin": import.meta.env.VITE_APP_ACCESS_CONTROL_ALLOW_ORIGIN,
           "Content-type": "application/json; charset=UTF-8"
         },
         body: JSON.stringify(request)
