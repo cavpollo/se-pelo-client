@@ -2,7 +2,13 @@ FROM node:24-alpine AS builder
 
 # Copy local code to the container image.
 WORKDIR /app
-COPY . ./
+COPY ./public/ ./public/
+COPY ./src/ ./src/
+COPY ./index.html ./index.html
+COPY ./nginx.conf ./nginx.conf
+COPY ./package-lock.json ./package-lock.json
+COPY ./package.json ./package.json
+COPY ./vite.config.js ./vite.config.js
 
 # Specify the arguments docker will need
 ARG SERVER_BASE_URL
